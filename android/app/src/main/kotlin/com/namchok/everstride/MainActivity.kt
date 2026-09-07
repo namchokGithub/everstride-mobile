@@ -1,5 +1,7 @@
 package com.namchok.everstride
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// FlutterFragmentActivity (not FlutterActivity) is required by the `health`
+// package's permission request flow (registerForActivityResult).
+class MainActivity : FlutterFragmentActivity()

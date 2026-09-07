@@ -5,4 +5,5 @@ abstract class HealthRepository {
   Future<Result<bool>> isAvailable();
   Future<Result<bool>> requestPermissions();
   Future<Result<int>> getTodaySteps();
+  Future<Result<int>> getStepsForDate(DateTime date);
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:health/health.dart';
 
 import 'app/router.dart';
 import 'app/theme/app_theme.dart';
@@ -8,6 +9,7 @@ import 'core/config/env.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Env.load();
+  await Health().configure();
   runApp(const ProviderScope(child: MyApp()));
 }
 
