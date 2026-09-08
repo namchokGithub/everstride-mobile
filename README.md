@@ -69,6 +69,18 @@ Do not run `flutter test` unless explicitly asked — see `everstride-docs/AGENT
 
 For current build status and what to work on next, see `everstride-docs/PROGRESS.md`.
 
+## Testing Health Connect on an Emulator
+
+An emulator has no pedometer, so it never generates real step data — Health Connect will read `0` steps even after granting permission. In debug builds, a "[Debug] Insert 500 test steps" button on the Home screen writes synthetic step data directly into Health Connect so the read path can be exercised without a real device.
+
+If the app's own permission requests stop showing a dialog and just silently fail (`SecurityException` in logcat, or a "No requestable permission in the request" log line), the permission is likely stuck with a `USER_FIXED` flag from earlier manual testing (e.g. mixing `adb shell pm revoke` with denying the real dialog). Clear it with:
+
+```sh
+adb shell pm reset-permissions <applicationId>
+```
+
+(`applicationId` is `com.namchok.everstride` — see `android/app/build.gradle.kts`.) This resets all of the app's permissions to "not yet decided," after which requesting them again from the app shows the dialog normally.
+
 ## Status
 
 Early development / MVP.
