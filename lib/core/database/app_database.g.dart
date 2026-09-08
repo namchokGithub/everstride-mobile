@@ -400,6 +400,21 @@ class $PlayerTable extends Player with TableInfo<$PlayerTable, PlayerData> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _hasReconciledHistoricalStepsMeta =
+      const VerificationMeta('hasReconciledHistoricalSteps');
+  @override
+  late final GeneratedColumn<bool> hasReconciledHistoricalSteps =
+      GeneratedColumn<bool>(
+        'has_reconciled_historical_steps',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("has_reconciled_historical_steps" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -408,6 +423,7 @@ class $PlayerTable extends Player with TableInfo<$PlayerTable, PlayerData> {
     energy,
     gold,
     pendingSteps,
+    hasReconciledHistoricalSteps,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -467,6 +483,15 @@ class $PlayerTable extends Player with TableInfo<$PlayerTable, PlayerData> {
     } else if (isInserting) {
       context.missing(_pendingStepsMeta);
     }
+    if (data.containsKey('has_reconciled_historical_steps')) {
+      context.handle(
+        _hasReconciledHistoricalStepsMeta,
+        hasReconciledHistoricalSteps.isAcceptableOrUnknown(
+          data['has_reconciled_historical_steps']!,
+          _hasReconciledHistoricalStepsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -500,6 +525,10 @@ class $PlayerTable extends Player with TableInfo<$PlayerTable, PlayerData> {
         DriftSqlType.int,
         data['${effectivePrefix}pending_steps'],
       )!,
+      hasReconciledHistoricalSteps: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_reconciled_historical_steps'],
+      )!,
     );
   }
 
@@ -516,6 +545,7 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
   final int energy;
   final int gold;
   final int pendingSteps;
+  final bool hasReconciledHistoricalSteps;
   const PlayerData({
     required this.id,
     required this.level,
@@ -523,6 +553,7 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
     required this.energy,
     required this.gold,
     required this.pendingSteps,
+    required this.hasReconciledHistoricalSteps,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -533,6 +564,9 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
     map['energy'] = Variable<int>(energy);
     map['gold'] = Variable<int>(gold);
     map['pending_steps'] = Variable<int>(pendingSteps);
+    map['has_reconciled_historical_steps'] = Variable<bool>(
+      hasReconciledHistoricalSteps,
+    );
     return map;
   }
 
@@ -544,6 +578,7 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
       energy: Value(energy),
       gold: Value(gold),
       pendingSteps: Value(pendingSteps),
+      hasReconciledHistoricalSteps: Value(hasReconciledHistoricalSteps),
     );
   }
 
@@ -559,6 +594,9 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
       energy: serializer.fromJson<int>(json['energy']),
       gold: serializer.fromJson<int>(json['gold']),
       pendingSteps: serializer.fromJson<int>(json['pendingSteps']),
+      hasReconciledHistoricalSteps: serializer.fromJson<bool>(
+        json['hasReconciledHistoricalSteps'],
+      ),
     );
   }
   @override
@@ -571,6 +609,9 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
       'energy': serializer.toJson<int>(energy),
       'gold': serializer.toJson<int>(gold),
       'pendingSteps': serializer.toJson<int>(pendingSteps),
+      'hasReconciledHistoricalSteps': serializer.toJson<bool>(
+        hasReconciledHistoricalSteps,
+      ),
     };
   }
 
@@ -581,6 +622,7 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
     int? energy,
     int? gold,
     int? pendingSteps,
+    bool? hasReconciledHistoricalSteps,
   }) => PlayerData(
     id: id ?? this.id,
     level: level ?? this.level,
@@ -588,6 +630,8 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
     energy: energy ?? this.energy,
     gold: gold ?? this.gold,
     pendingSteps: pendingSteps ?? this.pendingSteps,
+    hasReconciledHistoricalSteps:
+        hasReconciledHistoricalSteps ?? this.hasReconciledHistoricalSteps,
   );
   PlayerData copyWithCompanion(PlayerCompanion data) {
     return PlayerData(
@@ -599,6 +643,9 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
       pendingSteps: data.pendingSteps.present
           ? data.pendingSteps.value
           : this.pendingSteps,
+      hasReconciledHistoricalSteps: data.hasReconciledHistoricalSteps.present
+          ? data.hasReconciledHistoricalSteps.value
+          : this.hasReconciledHistoricalSteps,
     );
   }
 
@@ -610,13 +657,22 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
           ..write('exp: $exp, ')
           ..write('energy: $energy, ')
           ..write('gold: $gold, ')
-          ..write('pendingSteps: $pendingSteps')
+          ..write('pendingSteps: $pendingSteps, ')
+          ..write('hasReconciledHistoricalSteps: $hasReconciledHistoricalSteps')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, level, exp, energy, gold, pendingSteps);
+  int get hashCode => Object.hash(
+    id,
+    level,
+    exp,
+    energy,
+    gold,
+    pendingSteps,
+    hasReconciledHistoricalSteps,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -626,7 +682,9 @@ class PlayerData extends DataClass implements Insertable<PlayerData> {
           other.exp == this.exp &&
           other.energy == this.energy &&
           other.gold == this.gold &&
-          other.pendingSteps == this.pendingSteps);
+          other.pendingSteps == this.pendingSteps &&
+          other.hasReconciledHistoricalSteps ==
+              this.hasReconciledHistoricalSteps);
 }
 
 class PlayerCompanion extends UpdateCompanion<PlayerData> {
@@ -636,6 +694,7 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
   final Value<int> energy;
   final Value<int> gold;
   final Value<int> pendingSteps;
+  final Value<bool> hasReconciledHistoricalSteps;
   const PlayerCompanion({
     this.id = const Value.absent(),
     this.level = const Value.absent(),
@@ -643,6 +702,7 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
     this.energy = const Value.absent(),
     this.gold = const Value.absent(),
     this.pendingSteps = const Value.absent(),
+    this.hasReconciledHistoricalSteps = const Value.absent(),
   });
   PlayerCompanion.insert({
     this.id = const Value.absent(),
@@ -651,6 +711,7 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
     required int energy,
     required int gold,
     required int pendingSteps,
+    this.hasReconciledHistoricalSteps = const Value.absent(),
   }) : level = Value(level),
        exp = Value(exp),
        energy = Value(energy),
@@ -663,6 +724,7 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
     Expression<int>? energy,
     Expression<int>? gold,
     Expression<int>? pendingSteps,
+    Expression<bool>? hasReconciledHistoricalSteps,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -671,6 +733,8 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
       if (energy != null) 'energy': energy,
       if (gold != null) 'gold': gold,
       if (pendingSteps != null) 'pending_steps': pendingSteps,
+      if (hasReconciledHistoricalSteps != null)
+        'has_reconciled_historical_steps': hasReconciledHistoricalSteps,
     });
   }
 
@@ -681,6 +745,7 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
     Value<int>? energy,
     Value<int>? gold,
     Value<int>? pendingSteps,
+    Value<bool>? hasReconciledHistoricalSteps,
   }) {
     return PlayerCompanion(
       id: id ?? this.id,
@@ -689,6 +754,8 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
       energy: energy ?? this.energy,
       gold: gold ?? this.gold,
       pendingSteps: pendingSteps ?? this.pendingSteps,
+      hasReconciledHistoricalSteps:
+          hasReconciledHistoricalSteps ?? this.hasReconciledHistoricalSteps,
     );
   }
 
@@ -713,6 +780,11 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
     if (pendingSteps.present) {
       map['pending_steps'] = Variable<int>(pendingSteps.value);
     }
+    if (hasReconciledHistoricalSteps.present) {
+      map['has_reconciled_historical_steps'] = Variable<bool>(
+        hasReconciledHistoricalSteps.value,
+      );
+    }
     return map;
   }
 
@@ -724,7 +796,8 @@ class PlayerCompanion extends UpdateCompanion<PlayerData> {
           ..write('exp: $exp, ')
           ..write('energy: $energy, ')
           ..write('gold: $gold, ')
-          ..write('pendingSteps: $pendingSteps')
+          ..write('pendingSteps: $pendingSteps, ')
+          ..write('hasReconciledHistoricalSteps: $hasReconciledHistoricalSteps')
           ..write(')'))
         .toString();
   }
@@ -1157,6 +1230,7 @@ typedef $$PlayerTableCreateCompanionBuilder = PlayerCompanion Function({
   required int energy,
   required int gold,
   required int pendingSteps,
+  Value<bool> hasReconciledHistoricalSteps,
 });
 typedef $$PlayerTableUpdateCompanionBuilder = PlayerCompanion Function({
   Value<int> id,
@@ -1165,6 +1239,7 @@ typedef $$PlayerTableUpdateCompanionBuilder = PlayerCompanion Function({
   Value<int> energy,
   Value<int> gold,
   Value<int> pendingSteps,
+  Value<bool> hasReconciledHistoricalSteps,
 });
 
 class $$PlayerTableFilterComposer
@@ -1203,6 +1278,11 @@ class $$PlayerTableFilterComposer
 
   ColumnFilters<int> get pendingSteps => $composableBuilder(
     column: $table.pendingSteps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasReconciledHistoricalSteps => $composableBuilder(
+    column: $table.hasReconciledHistoricalSteps,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1245,6 +1325,11 @@ class $$PlayerTableOrderingComposer
     column: $table.pendingSteps,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get hasReconciledHistoricalSteps => $composableBuilder(
+    column: $table.hasReconciledHistoricalSteps,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PlayerTableAnnotationComposer
@@ -1273,6 +1358,11 @@ class $$PlayerTableAnnotationComposer
 
   GeneratedColumn<int> get pendingSteps => $composableBuilder(
     column: $table.pendingSteps,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hasReconciledHistoricalSteps => $composableBuilder(
+    column: $table.hasReconciledHistoricalSteps,
     builder: (column) => column,
   );
 }
@@ -1311,6 +1401,7 @@ class $$PlayerTableTableManager
                 Value<int> energy = const Value.absent(),
                 Value<int> gold = const Value.absent(),
                 Value<int> pendingSteps = const Value.absent(),
+                Value<bool> hasReconciledHistoricalSteps = const Value.absent(),
               }) => PlayerCompanion(
                 id: id,
                 level: level,
@@ -1318,6 +1409,7 @@ class $$PlayerTableTableManager
                 energy: energy,
                 gold: gold,
                 pendingSteps: pendingSteps,
+                hasReconciledHistoricalSteps: hasReconciledHistoricalSteps,
               ),
           createCompanionCallback:
               ({
@@ -1327,6 +1419,7 @@ class $$PlayerTableTableManager
                 required int energy,
                 required int gold,
                 required int pendingSteps,
+                Value<bool> hasReconciledHistoricalSteps = const Value.absent(),
               }) => PlayerCompanion.insert(
                 id: id,
                 level: level,
@@ -1334,6 +1427,7 @@ class $$PlayerTableTableManager
                 energy: energy,
                 gold: gold,
                 pendingSteps: pendingSteps,
+                hasReconciledHistoricalSteps: hasReconciledHistoricalSteps,
               ),
           withReferenceMapper: (p0) => p0
               .map(

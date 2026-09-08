@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/errors/result.dart';
 import '../../../../core/utils/app_logger.dart';
+import '../../../health/data/repositories/health_sync_repository_impl.dart';
 import '../../../health/presentation/controllers/health_sync_controller.dart';
 import '../../data/repositories/player_repository_impl.dart';
 import '../../domain/repositories/player_repository.dart';
 import '../../domain/usecases/credit_energy_from_steps_usecase.dart';
+import '../../domain/usecases/reconcile_historical_energy_usecase.dart';
 import '../../domain/usecases/spend_energy_for_adventure_usecase.dart';
 
 final creditEnergyFromStepsUseCaseProvider =
@@ -21,6 +23,13 @@ final spendEnergyForAdventureUseCaseProvider =
         ref.watch(playerRepositoryProvider),
       );
     });
+
+final reconcileHistoricalEnergyUseCaseProvider = Provider<ReconcileHistoricalEnergyUseCase>((ref) {
+  return ReconcileHistoricalEnergyUseCase(
+    ref.watch(playerRepositoryProvider),
+    ref.watch(healthSyncRepositoryProvider),
+  );
+});
 
 class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
   Future<void> _mutationQueue = Future.value();
@@ -39,7 +48,7 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
         _runExclusive(() => _creditEnergy(value.totalNewRewardableSteps));
       }
     });
-    _loadPlayer();
+    _initializePlayer();
     return null;
   }
 
@@ -48,6 +57,16 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
     state = await AsyncValue.guard(
       () => ref.read(playerRepositoryProvider).getPlayer(),
     );
+  }
+
+  Future<void> _initializePlayer() async {
+    await _runExclusive(() async {
+      final result = await ref.read(reconcileHistoricalEnergyUseCaseProvider).call();
+      if (result case Err(:final failure)) {
+        AppLogger.error('player.state', 'Failed to reconcile historical energy', failure);
+      }
+      await _loadPlayer();
+    });
   }
 
   Future<void> _creditEnergy(int newRewardableSteps) async {

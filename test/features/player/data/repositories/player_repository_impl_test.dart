@@ -27,10 +27,18 @@ void main() {
     expect(player.energy, 0);
     expect(player.gold, 0);
     expect(player.pendingSteps, 0);
+    expect(player.hasReconciledHistoricalSteps, isFalse);
   });
 
   test('savePlayer then getPlayer round-trips the same values', () async {
-    const player = PlayerState(level: 3, exp: 40, energy: 5, gold: 20, pendingSteps: 60);
+    const player = PlayerState(
+      level: 3,
+      exp: 40,
+      energy: 5,
+      gold: 20,
+      pendingSteps: 60,
+      hasReconciledHistoricalSteps: true,
+    );
     final saveResult = await repository.savePlayer(player);
     expect(saveResult, isA<Ok<bool>>());
 
@@ -42,6 +50,7 @@ void main() {
     expect(loaded.energy, 5);
     expect(loaded.gold, 20);
     expect(loaded.pendingSteps, 60);
+    expect(loaded.hasReconciledHistoricalSteps, isTrue);
   });
 
   test('savePlayer overwrites the existing row', () async {

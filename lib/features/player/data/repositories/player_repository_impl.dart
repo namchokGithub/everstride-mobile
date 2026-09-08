@@ -27,6 +27,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
         energy: row.energy,
         gold: row.gold,
         pendingSteps: row.pendingSteps,
+        hasReconciledHistoricalSteps: row.hasReconciledHistoricalSteps,
       ));
     } catch (e) {
       AppLogger.error('player.state', 'Failed to read player state', e);
@@ -45,6 +46,7 @@ class PlayerRepositoryImpl implements PlayerRepository {
               energy: Value(player.energy),
               gold: Value(player.gold),
               pendingSteps: Value(player.pendingSteps),
+              hasReconciledHistoricalSteps: Value(player.hasReconciledHistoricalSteps),
             ),
           );
       AppLogger.debug(

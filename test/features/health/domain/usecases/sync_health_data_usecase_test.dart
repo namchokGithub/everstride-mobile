@@ -39,6 +39,9 @@ class _FakeHealthRepository implements HealthRepository {
 
 class _FailingSyncRepository implements HealthSyncRepository {
   @override
+  Future<Result<int>> getTotalRewardedSteps() => throw UnimplementedError();
+
+  @override
   Future<Result<DateTime?>> getMostRecentSyncedDate() async =>
       const Err(Failure('simulated failure'));
 

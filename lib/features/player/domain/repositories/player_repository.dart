@@ -7,6 +7,7 @@ class PlayerState {
     required this.energy,
     required this.gold,
     required this.pendingSteps,
+    this.hasReconciledHistoricalSteps = false,
   });
 
   final int level;
@@ -14,6 +15,7 @@ class PlayerState {
   final int energy;
   final int gold;
   final int pendingSteps;
+  final bool hasReconciledHistoricalSteps;
 
   static int expToNextLevel(int level) => level * 100;
 
@@ -23,6 +25,7 @@ class PlayerState {
     int? energy,
     int? gold,
     int? pendingSteps,
+    bool? hasReconciledHistoricalSteps,
   }) {
     return PlayerState(
       level: level ?? this.level,
@@ -30,6 +33,8 @@ class PlayerState {
       energy: energy ?? this.energy,
       gold: gold ?? this.gold,
       pendingSteps: pendingSteps ?? this.pendingSteps,
+      hasReconciledHistoricalSteps:
+          hasReconciledHistoricalSteps ?? this.hasReconciledHistoricalSteps,
     );
   }
 }

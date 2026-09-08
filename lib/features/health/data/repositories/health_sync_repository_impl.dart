@@ -18,6 +18,17 @@ class HealthSyncRepositoryImpl implements HealthSyncRepository {
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
   @override
+  Future<Result<int>> getTotalRewardedSteps() async {
+    try {
+      final rows = await _db.select(_db.healthDaily).get();
+      return Ok(rows.fold(0, (sum, row) => sum + row.rewardedSteps));
+    } catch (e) {
+      AppLogger.error('health.sync', 'Failed to total rewarded steps', e);
+      return Err(Failure('Failed to total rewarded steps', cause: e));
+    }
+  }
+
+  @override
   Future<Result<DateTime?>> getMostRecentSyncedDate() async {
     try {
       final query = _db.select(_db.healthDaily)
