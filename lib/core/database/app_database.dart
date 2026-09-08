@@ -35,12 +35,20 @@ class Player extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [HealthDaily, Player])
+class AppSettings extends Table {
+  IntColumn get id => integer()();
+  BoolColumn get onboardingCompleted => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [HealthDaily, Player, AppSettings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -48,6 +56,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(player);
+          }
+          if (from < 3) {
+            await m.createTable(appSettings);
           }
         },
       );
