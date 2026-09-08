@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/result.dart';
 import '../../../health/presentation/controllers/health_availability_controller.dart';
 import '../../../health/presentation/controllers/health_permission_controller.dart';
+import '../../../health/presentation/controllers/health_sync_controller.dart';
 import '../../../health/presentation/widgets/debug_steps_seeder.dart';
 
 class MenuScreen extends ConsumerWidget {
@@ -29,6 +30,8 @@ class MenuScreen extends ConsumerWidget {
       AsyncError() => 'Error',
       _ => 'Requesting...',
     };
+    final sync = ref.watch(healthSyncControllerProvider);
+    final syncing = sync?.isLoading ?? false;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Menu')),
@@ -46,6 +49,15 @@ class MenuScreen extends ConsumerWidget {
             subtitle: Text(
               'Health Connect: $availabilityText · Permission: $permissionText',
             ),
+            trailing: syncing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.chevron_right),
+            enabled: !syncing,
+            onTap: () => ref.read(healthSyncControllerProvider.notifier).sync(),
           ),
           const ListTile(
             leading: Icon(Icons.info_outline),
