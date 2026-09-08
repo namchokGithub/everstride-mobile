@@ -71,7 +71,9 @@ class HealthRepositoryImpl implements HealthRepository {
   Future<Result<int>> getStepsForDate(DateTime date) async {
     try {
       final start = DateTime(date.year, date.month, date.day);
-      final end = start.add(const Duration(days: 1));
+      // Calendar arithmetic, not Duration: adding 24 absolute hours lands off
+      // midnight across a DST transition (a 23- or 25-hour local day).
+      final end = DateTime(start.year, start.month, start.day + 1);
       final steps = await _dataSource.getTotalSteps(start: start, end: end);
       AppLogger.debug('health.query', 'Read $steps steps for ${start.toIso8601String().split('T').first}');
       return Ok(steps);

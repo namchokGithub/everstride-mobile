@@ -5,6 +5,7 @@ import '../core/errors/result.dart';
 import '../features/health/data/repositories/health_repository_impl.dart';
 import '../features/health/presentation/controllers/health_availability_controller.dart';
 import '../features/health/presentation/controllers/health_permission_controller.dart';
+import '../features/health/presentation/controllers/health_sync_controller.dart';
 import '../features/health/presentation/controllers/steps_controller.dart';
 import '../features/health/presentation/widgets/debug_steps_seeder.dart';
 
@@ -123,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (context, ref, _) {
                         final selectedDate = ref.watch(selectedDateProvider);
                         final steps = ref.watch(stepsForSelectedDateProvider);
+                        final sync = ref.watch(healthSyncControllerProvider);
                         final dateLabel =
                             '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
                         final lastResult = steps.value;
@@ -130,6 +132,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           Ok(:final value) => '$value',
                           Err(:final failure) => 'Error (${failure.message})',
                           null => steps is AsyncError ? 'Error reading steps' : 'Loading...',
+                        };
+                        final syncText = switch (sync) {
+                          null => null,
+                          AsyncData(:final value) => switch (value) {
+                            Ok(:final value) => value.totalNewRewardableSteps > 0
+                                ? '+${value.totalNewRewardableSteps} rewardable steps synced'
+                                : 'No new rewardable steps',
+                            Err(:final failure) => 'Sync error (${failure.message})',
+                          },
+                          AsyncError() => 'Sync error',
+                          _ => 'Syncing...',
                         };
                         return Column(
                           children: [
@@ -149,9 +162,21 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                             ElevatedButton(
-                              onPressed: steps.isLoading ? null : () => ref.invalidate(stepsForSelectedDateProvider),
+                              onPressed: (steps.isLoading || (sync?.isLoading ?? false))
+                                  ? null
+                                  : () {
+                                      ref.invalidate(stepsForSelectedDateProvider);
+                                      ref.read(healthSyncControllerProvider.notifier).sync();
+                                    },
                               child: const Text('Sync Now'),
                             ),
+                            if (syncText == null)
+                              const SizedBox.shrink()
+                            else
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(syncText, style: const TextStyle(fontSize: 12)),
+                              ),
                             ElevatedButton(
                               onPressed: () async {
                                 final picked = await showDatePicker(
