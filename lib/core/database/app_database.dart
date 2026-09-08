@@ -23,12 +23,34 @@ class HealthDaily extends Table {
   Set<Column> get primaryKey => {date};
 }
 
-@DriftDatabase(tables: [HealthDaily])
+class Player extends Table {
+  IntColumn get id => integer()();
+  IntColumn get level => integer()();
+  IntColumn get exp => integer()();
+  IntColumn get energy => integer()();
+  IntColumn get gold => integer()();
+  IntColumn get pendingSteps => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [HealthDaily, Player])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(player);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(() async {

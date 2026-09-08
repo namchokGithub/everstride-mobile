@@ -339,15 +339,407 @@ class HealthDailyCompanion extends UpdateCompanion<HealthDailyData> {
   }
 }
 
+class $PlayerTable extends Player with TableInfo<$PlayerTable, PlayerData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlayerTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _levelMeta = const VerificationMeta('level');
+  @override
+  late final GeneratedColumn<int> level = GeneratedColumn<int>(
+    'level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expMeta = const VerificationMeta('exp');
+  @override
+  late final GeneratedColumn<int> exp = GeneratedColumn<int>(
+    'exp',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _energyMeta = const VerificationMeta('energy');
+  @override
+  late final GeneratedColumn<int> energy = GeneratedColumn<int>(
+    'energy',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _goldMeta = const VerificationMeta('gold');
+  @override
+  late final GeneratedColumn<int> gold = GeneratedColumn<int>(
+    'gold',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pendingStepsMeta = const VerificationMeta(
+    'pendingSteps',
+  );
+  @override
+  late final GeneratedColumn<int> pendingSteps = GeneratedColumn<int>(
+    'pending_steps',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    level,
+    exp,
+    energy,
+    gold,
+    pendingSteps,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'player';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlayerData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('level')) {
+      context.handle(
+        _levelMeta,
+        level.isAcceptableOrUnknown(data['level']!, _levelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_levelMeta);
+    }
+    if (data.containsKey('exp')) {
+      context.handle(
+        _expMeta,
+        exp.isAcceptableOrUnknown(data['exp']!, _expMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_expMeta);
+    }
+    if (data.containsKey('energy')) {
+      context.handle(
+        _energyMeta,
+        energy.isAcceptableOrUnknown(data['energy']!, _energyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_energyMeta);
+    }
+    if (data.containsKey('gold')) {
+      context.handle(
+        _goldMeta,
+        gold.isAcceptableOrUnknown(data['gold']!, _goldMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_goldMeta);
+    }
+    if (data.containsKey('pending_steps')) {
+      context.handle(
+        _pendingStepsMeta,
+        pendingSteps.isAcceptableOrUnknown(
+          data['pending_steps']!,
+          _pendingStepsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pendingStepsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlayerData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlayerData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      level: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}level'],
+      )!,
+      exp: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}exp'],
+      )!,
+      energy: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}energy'],
+      )!,
+      gold: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gold'],
+      )!,
+      pendingSteps: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pending_steps'],
+      )!,
+    );
+  }
+
+  @override
+  $PlayerTable createAlias(String alias) {
+    return $PlayerTable(attachedDatabase, alias);
+  }
+}
+
+class PlayerData extends DataClass implements Insertable<PlayerData> {
+  final int id;
+  final int level;
+  final int exp;
+  final int energy;
+  final int gold;
+  final int pendingSteps;
+  const PlayerData({
+    required this.id,
+    required this.level,
+    required this.exp,
+    required this.energy,
+    required this.gold,
+    required this.pendingSteps,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['level'] = Variable<int>(level);
+    map['exp'] = Variable<int>(exp);
+    map['energy'] = Variable<int>(energy);
+    map['gold'] = Variable<int>(gold);
+    map['pending_steps'] = Variable<int>(pendingSteps);
+    return map;
+  }
+
+  PlayerCompanion toCompanion(bool nullToAbsent) {
+    return PlayerCompanion(
+      id: Value(id),
+      level: Value(level),
+      exp: Value(exp),
+      energy: Value(energy),
+      gold: Value(gold),
+      pendingSteps: Value(pendingSteps),
+    );
+  }
+
+  factory PlayerData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlayerData(
+      id: serializer.fromJson<int>(json['id']),
+      level: serializer.fromJson<int>(json['level']),
+      exp: serializer.fromJson<int>(json['exp']),
+      energy: serializer.fromJson<int>(json['energy']),
+      gold: serializer.fromJson<int>(json['gold']),
+      pendingSteps: serializer.fromJson<int>(json['pendingSteps']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'level': serializer.toJson<int>(level),
+      'exp': serializer.toJson<int>(exp),
+      'energy': serializer.toJson<int>(energy),
+      'gold': serializer.toJson<int>(gold),
+      'pendingSteps': serializer.toJson<int>(pendingSteps),
+    };
+  }
+
+  PlayerData copyWith({
+    int? id,
+    int? level,
+    int? exp,
+    int? energy,
+    int? gold,
+    int? pendingSteps,
+  }) => PlayerData(
+    id: id ?? this.id,
+    level: level ?? this.level,
+    exp: exp ?? this.exp,
+    energy: energy ?? this.energy,
+    gold: gold ?? this.gold,
+    pendingSteps: pendingSteps ?? this.pendingSteps,
+  );
+  PlayerData copyWithCompanion(PlayerCompanion data) {
+    return PlayerData(
+      id: data.id.present ? data.id.value : this.id,
+      level: data.level.present ? data.level.value : this.level,
+      exp: data.exp.present ? data.exp.value : this.exp,
+      energy: data.energy.present ? data.energy.value : this.energy,
+      gold: data.gold.present ? data.gold.value : this.gold,
+      pendingSteps: data.pendingSteps.present
+          ? data.pendingSteps.value
+          : this.pendingSteps,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlayerData(')
+          ..write('id: $id, ')
+          ..write('level: $level, ')
+          ..write('exp: $exp, ')
+          ..write('energy: $energy, ')
+          ..write('gold: $gold, ')
+          ..write('pendingSteps: $pendingSteps')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, level, exp, energy, gold, pendingSteps);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlayerData &&
+          other.id == this.id &&
+          other.level == this.level &&
+          other.exp == this.exp &&
+          other.energy == this.energy &&
+          other.gold == this.gold &&
+          other.pendingSteps == this.pendingSteps);
+}
+
+class PlayerCompanion extends UpdateCompanion<PlayerData> {
+  final Value<int> id;
+  final Value<int> level;
+  final Value<int> exp;
+  final Value<int> energy;
+  final Value<int> gold;
+  final Value<int> pendingSteps;
+  const PlayerCompanion({
+    this.id = const Value.absent(),
+    this.level = const Value.absent(),
+    this.exp = const Value.absent(),
+    this.energy = const Value.absent(),
+    this.gold = const Value.absent(),
+    this.pendingSteps = const Value.absent(),
+  });
+  PlayerCompanion.insert({
+    this.id = const Value.absent(),
+    required int level,
+    required int exp,
+    required int energy,
+    required int gold,
+    required int pendingSteps,
+  }) : level = Value(level),
+       exp = Value(exp),
+       energy = Value(energy),
+       gold = Value(gold),
+       pendingSteps = Value(pendingSteps);
+  static Insertable<PlayerData> custom({
+    Expression<int>? id,
+    Expression<int>? level,
+    Expression<int>? exp,
+    Expression<int>? energy,
+    Expression<int>? gold,
+    Expression<int>? pendingSteps,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (level != null) 'level': level,
+      if (exp != null) 'exp': exp,
+      if (energy != null) 'energy': energy,
+      if (gold != null) 'gold': gold,
+      if (pendingSteps != null) 'pending_steps': pendingSteps,
+    });
+  }
+
+  PlayerCompanion copyWith({
+    Value<int>? id,
+    Value<int>? level,
+    Value<int>? exp,
+    Value<int>? energy,
+    Value<int>? gold,
+    Value<int>? pendingSteps,
+  }) {
+    return PlayerCompanion(
+      id: id ?? this.id,
+      level: level ?? this.level,
+      exp: exp ?? this.exp,
+      energy: energy ?? this.energy,
+      gold: gold ?? this.gold,
+      pendingSteps: pendingSteps ?? this.pendingSteps,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (level.present) {
+      map['level'] = Variable<int>(level.value);
+    }
+    if (exp.present) {
+      map['exp'] = Variable<int>(exp.value);
+    }
+    if (energy.present) {
+      map['energy'] = Variable<int>(energy.value);
+    }
+    if (gold.present) {
+      map['gold'] = Variable<int>(gold.value);
+    }
+    if (pendingSteps.present) {
+      map['pending_steps'] = Variable<int>(pendingSteps.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlayerCompanion(')
+          ..write('id: $id, ')
+          ..write('level: $level, ')
+          ..write('exp: $exp, ')
+          ..write('energy: $energy, ')
+          ..write('gold: $gold, ')
+          ..write('pendingSteps: $pendingSteps')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $HealthDailyTable healthDaily = $HealthDailyTable(this);
+  late final $PlayerTable player = $PlayerTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [healthDaily];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [healthDaily, player];
 }
 
 typedef $$HealthDailyTableCreateCompanionBuilder =
@@ -546,10 +938,228 @@ typedef $$HealthDailyTableProcessedTableManager =
       HealthDailyData,
       PrefetchHooks Function()
     >;
+typedef $$PlayerTableCreateCompanionBuilder = PlayerCompanion Function({
+  Value<int> id,
+  required int level,
+  required int exp,
+  required int energy,
+  required int gold,
+  required int pendingSteps,
+});
+typedef $$PlayerTableUpdateCompanionBuilder = PlayerCompanion Function({
+  Value<int> id,
+  Value<int> level,
+  Value<int> exp,
+  Value<int> energy,
+  Value<int> gold,
+  Value<int> pendingSteps,
+});
+
+class $$PlayerTableFilterComposer
+    extends Composer<_$AppDatabase, $PlayerTable> {
+  $$PlayerTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get exp => $composableBuilder(
+    column: $table.exp,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get energy => $composableBuilder(
+    column: $table.energy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gold => $composableBuilder(
+    column: $table.gold,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pendingSteps => $composableBuilder(
+    column: $table.pendingSteps,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PlayerTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlayerTable> {
+  $$PlayerTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get exp => $composableBuilder(
+    column: $table.exp,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get energy => $composableBuilder(
+    column: $table.energy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gold => $composableBuilder(
+    column: $table.gold,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pendingSteps => $composableBuilder(
+    column: $table.pendingSteps,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlayerTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlayerTable> {
+  $$PlayerTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get level =>
+      $composableBuilder(column: $table.level, builder: (column) => column);
+
+  GeneratedColumn<int> get exp =>
+      $composableBuilder(column: $table.exp, builder: (column) => column);
+
+  GeneratedColumn<int> get energy =>
+      $composableBuilder(column: $table.energy, builder: (column) => column);
+
+  GeneratedColumn<int> get gold =>
+      $composableBuilder(column: $table.gold, builder: (column) => column);
+
+  GeneratedColumn<int> get pendingSteps => $composableBuilder(
+    column: $table.pendingSteps,
+    builder: (column) => column,
+  );
+}
+
+class $$PlayerTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlayerTable,
+          PlayerData,
+          $$PlayerTableFilterComposer,
+          $$PlayerTableOrderingComposer,
+          $$PlayerTableAnnotationComposer,
+          $$PlayerTableCreateCompanionBuilder,
+          $$PlayerTableUpdateCompanionBuilder,
+          (PlayerData, BaseReferences<_$AppDatabase, $PlayerTable, PlayerData>),
+          PlayerData,
+          PrefetchHooks Function()
+        > {
+  $$PlayerTableTableManager(_$AppDatabase db, $PlayerTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlayerTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlayerTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlayerTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> level = const Value.absent(),
+                Value<int> exp = const Value.absent(),
+                Value<int> energy = const Value.absent(),
+                Value<int> gold = const Value.absent(),
+                Value<int> pendingSteps = const Value.absent(),
+              }) => PlayerCompanion(
+                id: id,
+                level: level,
+                exp: exp,
+                energy: energy,
+                gold: gold,
+                pendingSteps: pendingSteps,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int level,
+                required int exp,
+                required int energy,
+                required int gold,
+                required int pendingSteps,
+              }) => PlayerCompanion.insert(
+                id: id,
+                level: level,
+                exp: exp,
+                energy: energy,
+                gold: gold,
+                pendingSteps: pendingSteps,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlayerTable, PlayerData>(table),
+                  BaseReferences<_$AppDatabase, $PlayerTable, PlayerData>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PlayerTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlayerTable,
+      PlayerData,
+      $$PlayerTableFilterComposer,
+      $$PlayerTableOrderingComposer,
+      $$PlayerTableAnnotationComposer,
+      $$PlayerTableCreateCompanionBuilder,
+      $$PlayerTableUpdateCompanionBuilder,
+      (PlayerData, BaseReferences<_$AppDatabase, $PlayerTable, PlayerData>),
+      PlayerData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$HealthDailyTableTableManager get healthDaily =>
       $$HealthDailyTableTableManager(_db, _db.healthDaily);
+  $$PlayerTableTableManager get player =>
+      $$PlayerTableTableManager(_db, _db.player);
 }

@@ -19,6 +19,10 @@ class DebugStepsSeeder extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (!kDebugMode) return const SizedBox.shrink();
 
+    final selectedDate = ref.watch(selectedDateProvider);
+    final dateLabel =
+        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+
     return ElevatedButton(
       onPressed: () async {
         final health = Health();
@@ -26,8 +30,7 @@ class DebugStepsSeeder extends ConsumerWidget {
           [HealthDataType.STEPS],
           permissions: [HealthDataAccess.READ_WRITE],
         );
-        final now = DateTime.now();
-        final midnight = DateTime(now.year, now.month, now.day);
+        final midnight = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
         final start = midnight.add(Duration(minutes: _slot * 2));
         _slot++;
         await health.writeHealthData(
@@ -38,7 +41,7 @@ class DebugStepsSeeder extends ConsumerWidget {
         );
         ref.invalidate(stepsForSelectedDateProvider);
       },
-      child: const Text('[Debug] Insert 500 test steps'),
+      child: Text('[Debug] Insert 500 test steps ($dateLabel)'),
     );
   }
 }
