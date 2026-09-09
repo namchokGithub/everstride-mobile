@@ -21,7 +21,11 @@ class _SuccessfulPlayerController extends PlayerController {
   AsyncValue<Result<PlayerState>>? build() => const AsyncData(Ok(_player));
 
   @override
-  Future<Result<PlayerState>> spendOnAdventure() async {
+  Future<Result<PlayerState>> spendOnAdventure({
+    required int energyCost,
+    required int expReward,
+    required int goldReward,
+  }) async {
     spendCallCount++;
     return const Ok(_player);
   }
@@ -32,7 +36,11 @@ class _FailingPlayerController extends PlayerController {
   AsyncValue<Result<PlayerState>>? build() => const AsyncData(Ok(_player));
 
   @override
-  Future<Result<PlayerState>> spendOnAdventure() async {
+  Future<Result<PlayerState>> spendOnAdventure({
+    required int energyCost,
+    required int expReward,
+    required int goldReward,
+  }) async {
     return const Err(Failure('Not enough energy'));
   }
 }

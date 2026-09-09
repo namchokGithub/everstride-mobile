@@ -24,12 +24,13 @@ final spendEnergyForAdventureUseCaseProvider =
       );
     });
 
-final reconcileHistoricalEnergyUseCaseProvider = Provider<ReconcileHistoricalEnergyUseCase>((ref) {
-  return ReconcileHistoricalEnergyUseCase(
-    ref.watch(playerRepositoryProvider),
-    ref.watch(healthSyncRepositoryProvider),
-  );
-});
+final reconcileHistoricalEnergyUseCaseProvider =
+    Provider<ReconcileHistoricalEnergyUseCase>((ref) {
+      return ReconcileHistoricalEnergyUseCase(
+        ref.watch(playerRepositoryProvider),
+        ref.watch(healthSyncRepositoryProvider),
+      );
+    });
 
 class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
   Future<void> _mutationQueue = Future.value();
@@ -61,9 +62,15 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
 
   Future<void> _initializePlayer() async {
     await _runExclusive(() async {
-      final result = await ref.read(reconcileHistoricalEnergyUseCaseProvider).call();
+      final result = await ref
+          .read(reconcileHistoricalEnergyUseCaseProvider)
+          .call();
       if (result case Err(:final failure)) {
-        AppLogger.error('player.state', 'Failed to reconcile historical energy', failure);
+        AppLogger.error(
+          'player.state',
+          'Failed to reconcile historical energy',
+          failure,
+        );
       }
       await _loadPlayer();
     });
@@ -106,11 +113,19 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
 
   /// Returns the spend result so the caller can show "not enough energy"
   /// feedback; on success, also refreshes the persisted player state.
-  Future<Result<PlayerState>> spendOnAdventure() {
+  Future<Result<PlayerState>> spendOnAdventure({
+    required int energyCost,
+    required int expReward,
+    required int goldReward,
+  }) {
     return _runExclusive(() async {
       final result = await ref
           .read(spendEnergyForAdventureUseCaseProvider)
-          .call();
+          .call(
+            energyCost: energyCost,
+            expReward: expReward,
+            goldReward: goldReward,
+          );
       if (result case Ok()) {
         await _loadPlayer();
       }

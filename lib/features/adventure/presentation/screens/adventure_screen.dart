@@ -19,7 +19,7 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
   Future<void> _startAdventure() async {
     final result = await ref
         .read(playerControllerProvider.notifier)
-        .spendOnAdventure();
+        .spendOnAdventure(energyCost: 10, expReward: 25, goldReward: 10);
     if (!mounted) return;
 
     final message = switch (result) {

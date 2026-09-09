@@ -1,20 +1,18 @@
 import '../../../../core/errors/result.dart';
 import '../repositories/player_repository.dart';
 
-/// Temporary placeholder Adventure (Phase 4 replaces this with a real
-/// Adventure system) — fixed cost/reward taken directly from the plan's
-/// own Phase 4 example ("Forest Path"). See
-/// everstride-docs/specs/2026-09-08-phase3-player-progression-design.md.
+/// Resolves an Adventure attempt using the caller-provided cost and rewards.
+/// This use case owns Player-state updates, not Adventure content.
 class SpendEnergyForAdventureUseCase {
   SpendEnergyForAdventureUseCase(this._playerRepository);
 
   final PlayerRepository _playerRepository;
 
-  static const energyCost = 10;
-  static const expReward = 25;
-  static const goldReward = 10;
-
-  Future<Result<PlayerState>> call() async {
+  Future<Result<PlayerState>> call({
+    required int energyCost,
+    required int expReward,
+    required int goldReward,
+  }) async {
     final playerResult = await _playerRepository.getPlayer();
     final PlayerState player;
     switch (playerResult) {
