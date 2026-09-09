@@ -26,8 +26,9 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [Icon(Icons.eco), SizedBox(width: 8), Text('Everstride')],
+        title: Image.asset(
+          'lib/assets/branding/logo-horizontal.png',
+          height: 32,
         ),
         actions: [
           IconButton(

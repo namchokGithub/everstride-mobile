@@ -44,22 +44,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset('lib/assets/bg.png', fit: BoxFit.cover),
-          const Center(
+          Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.eco, size: 64, color: Colors.white),
-                SizedBox(height: 12),
-                Text(
-                  'Everstride',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 24),
-                CircularProgressIndicator(color: Colors.white),
+                Image.asset('lib/assets/branding/splash-logo.png', width: 220),
+                const SizedBox(height: 24),
+                const CircularProgressIndicator(color: Colors.white),
               ],
             ),
           ),

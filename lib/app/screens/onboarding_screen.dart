@@ -15,9 +15,13 @@ class OnboardingScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Image.asset(
+                    'lib/assets/branding/logo-wordmark.png',
+                    width: 180,
+                  ),
+                  const Spacer(),
                   const Text(
                     'Real Steps\nReal Adventures',
                     style: TextStyle(
