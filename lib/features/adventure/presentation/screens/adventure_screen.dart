@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/errors/result.dart';
 import '../../../player/presentation/controllers/player_controller.dart';
-
-enum _AdventureDifficulty { easy, normal, hard }
+import '../../domain/adventure_catalog.dart';
+import '../../domain/entities/adventure.dart';
+import '../models/adventure_result.dart';
 
 class AdventureScreen extends ConsumerStatefulWidget {
   const AdventureScreen({super.key});
@@ -14,24 +16,88 @@ class AdventureScreen extends ConsumerStatefulWidget {
 }
 
 class _AdventureScreenState extends ConsumerState<AdventureScreen> {
-  var _selectedDifficulty = _AdventureDifficulty.easy;
+  static const _adventure = greenwoodTrail;
+  String _selectedDifficultyId = greenwoodTrail.defaultDifficultyId;
+  var _isStarting = false;
+
+  AdventureDifficulty get _selectedDifficulty =>
+      _adventure.difficultyById(_selectedDifficultyId);
 
   Future<void> _startAdventure() async {
+    if (_isStarting) return;
+
+    final difficulty = _selectedDifficulty;
+    final playerBefore = switch (ref.read(playerControllerProvider)?.value) {
+      Ok(:final value) => value,
+      _ => null,
+    };
+    if (playerBefore == null) return;
+
+    if (playerBefore.energy < difficulty.energyCost) {
+      await _showInsufficientEnergyDialog(difficulty, playerBefore.energy);
+      return;
+    }
+
+    setState(() => _isStarting = true);
     final result = await ref
         .read(playerControllerProvider.notifier)
-        .spendOnAdventure(energyCost: 10, expReward: 25, goldReward: 10);
+        .spendOnAdventure(
+          energyCost: difficulty.energyCost,
+          expReward: difficulty.expReward,
+          goldReward: difficulty.goldReward,
+        );
     if (!mounted) return;
+    setState(() => _isStarting = false);
 
-    final message = switch (result) {
-      Ok() => 'Adventure complete! +25 EXP, +10 Gold',
-      Err(:final failure) => failure.message,
-    };
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    switch (result) {
+      case Ok(:final value):
+        context.push(
+          '/adventure-result',
+          extra: AdventureResult(
+            adventureName: _adventure.name,
+            difficultyLabel: difficulty.label,
+            energySpent: difficulty.energyCost,
+            expGained: difficulty.expReward,
+            goldGained: difficulty.goldReward,
+            levelBefore: playerBefore.level,
+            playerAfter: value,
+          ),
+        );
+      case Err(:final failure):
+        if (failure.message == 'Not enough energy') {
+          await _showInsufficientEnergyDialog(difficulty, playerBefore.energy);
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(failure.message)));
+        }
+    }
+  }
+
+  Future<void> _showInsufficientEnergyDialog(
+    AdventureDifficulty difficulty,
+    int currentEnergy,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Not enough Energy'),
+        content: Text(
+          '${_adventure.name} (${difficulty.label}) costs ${difficulty.energyCost} Energy. '
+          'You have $currentEnergy. Walk more to earn Energy, or pick an easier difficulty.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final difficulty = _selectedDifficulty;
     return Scaffold(
       appBar: AppBar(title: const Text('Adventure')),
       body: SingleChildScrollView(
@@ -39,13 +105,13 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Greenwood Trail',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              _adventure.name,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              'A peaceful path through the forest.',
+              _adventure.description,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -65,21 +131,16 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: _AdventureDifficulty.values
+              children: _adventure.difficultyOptions
                   .map(
-                    (difficulty) => ChoiceChip(
-                      label: Text(_labelFor(difficulty)),
-                      selected: _selectedDifficulty == difficulty,
+                    (option) => ChoiceChip(
+                      label: Text(option.label),
+                      selected: _selectedDifficultyId == option.id,
                       onSelected: (_) =>
-                          setState(() => _selectedDifficulty = difficulty),
+                          setState(() => _selectedDifficultyId = option.id),
                     ),
                   )
                   .toList(),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Difficulty effects arrive in Phase 4.',
-              style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 24),
             const Text(
@@ -87,38 +148,39 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            const Row(
+            Row(
               children: [
                 Expanded(
-                  child: _RewardCard(icon: Icons.auto_graph, label: '+25 EXP'),
+                  child: _RewardCard(
+                    icon: Icons.auto_graph,
+                    label: '+${difficulty.expReward} EXP',
+                  ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _RewardCard(
                     icon: Icons.monetization_on,
-                    label: '+10 Gold',
+                    label: '+${difficulty.goldReward} Gold',
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
-              onPressed: _startAdventure,
-              icon: const Icon(Icons.bolt),
-              label: const Text('Start Adventure · 10 Energy'),
+              onPressed: _isStarting ? null : _startAdventure,
+              icon: _isStarting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.bolt),
+              label: Text('Start Adventure · ${difficulty.energyCost} Energy'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _labelFor(_AdventureDifficulty difficulty) {
-    return switch (difficulty) {
-      _AdventureDifficulty.easy => 'Easy',
-      _AdventureDifficulty.normal => 'Normal',
-      _AdventureDifficulty.hard => 'Hard',
-    };
   }
 }
 

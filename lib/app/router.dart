@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 
+import '../features/adventure/presentation/models/adventure_result.dart';
+import '../features/adventure/presentation/screens/adventure_result_screen.dart';
 import '../features/adventure/presentation/screens/adventure_screen.dart';
 import '../features/journal/presentation/screens/journal_screen.dart';
 import '../features/player/presentation/screens/character_screen.dart';
@@ -21,6 +23,11 @@ final router = GoRouter(
     GoRoute(
       path: '/permission',
       builder: (context, state) => const PermissionScreen(),
+    ),
+    GoRoute(
+      path: '/adventure-result',
+      builder: (context, state) =>
+          AdventureResultScreen(result: state.extra as AdventureResult),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
