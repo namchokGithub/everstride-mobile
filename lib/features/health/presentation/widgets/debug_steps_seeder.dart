@@ -5,6 +5,7 @@ import 'package:health/health.dart';
 
 import '../../../../core/errors/result.dart';
 import '../../data/repositories/debug_step_seed_repository_impl.dart';
+import '../../domain/debug_step_seed_slots.dart';
 import '../controllers/steps_controller.dart';
 
 /// Debug-only: seeds Health Connect with test steps, since emulators can't
@@ -17,10 +18,7 @@ class DebugStepsSeeder extends ConsumerStatefulWidget {
 }
 
 class _DebugStepsSeederState extends ConsumerState<DebugStepsSeeder> {
-  static const _minutesPerSlot = 2;
-  static const _maxSlots = 24 * 60 ~/ _minutesPerSlot;
-
-  final _stepsController = TextEditingController(text: '500');
+  final _stepsController = TextEditingController(text: '100');
   var _isSeeding = false;
 
   @override
@@ -38,17 +36,29 @@ class _DebugStepsSeederState extends ConsumerState<DebugStepsSeeder> {
       return;
     }
 
+    final latestSlotResult = DebugStepSeedSlots.latestAvailableSlot(
+      date: selectedDate,
+      now: DateTime.now(),
+    );
+    if (latestSlotResult case Err(:final failure)) {
+      _showNotification(failure.message);
+      return;
+    }
+    final latestSlot = (latestSlotResult as Ok<int>).value;
+
     setState(() => _isSeeding = true);
     try {
-      final initialSlot = _initialSlotFor(DateTime.now());
       final slotResult = await ref
           .read(debugStepSeedRepositoryProvider)
-          .claimNextSlot(date: selectedDate, initialSlot: initialSlot);
+          .claimLatestPastSlot(
+            date: selectedDate,
+            latestAvailableSlot: latestSlot,
+          );
       final slot = switch (slotResult) {
         Ok(value: final value) => value,
         Err(:final failure) => throw failure,
       };
-      if (slot >= _maxSlots) {
+      if (slot < 0) {
         throw StateError('No debug step time slots remain for this date.');
       }
 
@@ -57,12 +67,7 @@ class _DebugStepsSeederState extends ConsumerState<DebugStepsSeeder> {
         [HealthDataType.STEPS],
         permissions: [HealthDataAccess.READ_WRITE],
       );
-      final midnight = DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-      );
-      final start = midnight.add(Duration(minutes: slot * _minutesPerSlot));
+      final start = DebugStepSeedSlots.startForSlot(selectedDate, slot);
       final wrote = await health.writeHealthData(
         value: steps.toDouble(),
         type: HealthDataType.STEPS,
@@ -75,20 +80,34 @@ class _DebugStepsSeederState extends ConsumerState<DebugStepsSeeder> {
       ref.invalidate(stepsForSelectedDateProvider);
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not insert test steps: $error')),
-        );
+        _showNotification(_errorMessageFor(error));
       }
     } finally {
       if (mounted) setState(() => _isSeeding = false);
     }
   }
 
-  int _initialSlotFor(DateTime now) {
-    // Start new installs near the current clock time rather than midnight,
-    // avoiding legacy debug records written by previous app versions.
-    final minute = now.hour * 60 + now.minute;
-    return minute ~/ _minutesPerSlot;
+  void _showNotification(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(behavior: SnackBarBehavior.floating, content: Text(message)),
+    );
+  }
+
+  String _errorMessageFor(Object error) {
+    final message = error.toString().toLowerCase();
+    if (message.contains('must not be in the future')) {
+      return 'That debug time slot is not ready yet. Wait a few minutes and try again.';
+    }
+    if (message.contains('no debug step time slots remain')) {
+      return 'No debug step time slots remain for this date.';
+    }
+    if (message.contains('future date')) {
+      return 'Cannot insert test steps for a future date.';
+    }
+    if (message.contains('did not save the test steps')) {
+      return 'Health Connect could not save the test steps. Try again.';
+    }
+    return 'Could not insert test steps. Please try again.';
   }
 
   @override
@@ -108,7 +127,7 @@ class _DebugStepsSeederState extends ConsumerState<DebugStepsSeeder> {
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(
             labelText: 'Test steps',
-            hintText: '500',
+            hintText: '100',
           ),
         ),
         const SizedBox(height: 8),

@@ -1,3 +1,5 @@
+import 'package:drift/native.dart';
+import 'package:everstride/core/database/app_database.dart';
 import 'package:everstride/core/errors/result.dart';
 import 'package:everstride/features/player/domain/repositories/player_repository.dart';
 import 'package:everstride/features/player/domain/usecases/spend_energy_for_adventure_usecase.dart';
@@ -19,6 +21,10 @@ class _FakePlayerRepository implements PlayerRepository {
 }
 
 void main() {
+  late AppDatabase database;
+
+  setUp(() => database = AppDatabase(NativeDatabase.memory()));
+  tearDown(() => database.close());
   test(
     'sufficient energy, no level-up: updates energy/exp/gold, level unchanged',
     () async {
@@ -31,7 +37,7 @@ void main() {
           pendingSteps: 0,
         ),
       );
-      final useCase = SpendEnergyForAdventureUseCase(repo);
+      final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
       final result = await useCase.call(
         energyCost: 10,
@@ -57,7 +63,7 @@ void main() {
         pendingSteps: 0,
       ),
     );
-    final useCase = SpendEnergyForAdventureUseCase(repo);
+    final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
     final result = await useCase.call(
       energyCost: 10,
@@ -80,7 +86,7 @@ void main() {
         pendingSteps: 0,
       ),
     );
-    final useCase = SpendEnergyForAdventureUseCase(repo);
+    final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
     final result = await useCase.call(
       energyCost: 10,
@@ -105,7 +111,7 @@ void main() {
           pendingSteps: 0,
         ),
       );
-      final useCase = SpendEnergyForAdventureUseCase(repo);
+      final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
       final result = await useCase.call(
         energyCost: 10,
@@ -132,7 +138,7 @@ void main() {
           pendingSteps: 0,
         ),
       );
-      final useCase = SpendEnergyForAdventureUseCase(repo);
+      final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
       final result = await useCase.call(
         energyCost: 20,
@@ -159,7 +165,7 @@ void main() {
           pendingSteps: 0,
         ),
       );
-      final useCase = SpendEnergyForAdventureUseCase(repo);
+      final useCase = SpendEnergyForAdventureUseCase(repo, database);
 
       final result = await useCase.call(
         energyCost: 30,
@@ -171,4 +177,64 @@ void main() {
       expect(repo.state.energy, 20);
     },
   );
+
+  test('additional Gold cost is deducted alongside the reward', () async {
+    final repo = _FakePlayerRepository(
+      const PlayerState(
+        level: 1,
+        exp: 0,
+        energy: 10,
+        gold: 50,
+        pendingSteps: 0,
+      ),
+    );
+    final result = await SpendEnergyForAdventureUseCase(repo, database).call(
+      energyCost: 10,
+      expReward: 37,
+      goldReward: 15,
+      additionalGoldCost: 30,
+    );
+    expect((result as Ok<PlayerState>).value.gold, 35);
+  });
+
+  test('insufficient Gold leaves Player unchanged', () async {
+    final repo = _FakePlayerRepository(
+      const PlayerState(
+        level: 1,
+        exp: 0,
+        energy: 10,
+        gold: 10,
+        pendingSteps: 0,
+      ),
+    );
+    final result = await SpendEnergyForAdventureUseCase(repo, database).call(
+      energyCost: 10,
+      expReward: 37,
+      goldReward: 15,
+      additionalGoldCost: 30,
+    );
+    expect(result, isA<Err<PlayerState>>());
+    expect(repo.state.energy, 10);
+    expect(repo.state.gold, 10);
+  });
+
+  test('negative additional Gold cost is rejected', () async {
+    final repo = _FakePlayerRepository(
+      const PlayerState(
+        level: 1,
+        exp: 0,
+        energy: 10,
+        gold: 10,
+        pendingSteps: 0,
+      ),
+    );
+    final result = await SpendEnergyForAdventureUseCase(repo, database).call(
+      energyCost: 10,
+      expReward: 25,
+      goldReward: 10,
+      additionalGoldCost: -1,
+    );
+    expect(result, isA<Err<PlayerState>>());
+    expect(repo.state.gold, 10);
+  });
 }

@@ -20,8 +20,11 @@ class AdventureScreen extends ConsumerStatefulWidget {
 
 class _AdventureScreenState extends ConsumerState<AdventureScreen> {
   static const _adventure = greenwoodTrail;
+  static const _trailSuppliesCost = 30;
+  static const _trailSuppliesMultiplier = 1.5;
   String _selectedDifficultyId = greenwoodTrail.defaultDifficultyId;
   var _isStarting = false;
+  var _useTrailSupplies = false;
 
   AdventureDifficulty get _selectedDifficulty =>
       _adventure.difficultyById(_selectedDifficultyId);
@@ -41,19 +44,35 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
       return;
     }
 
+    final applySupplies =
+        _useTrailSupplies && playerBefore.gold >= _trailSuppliesCost;
+    if (_useTrailSupplies && !applySupplies) {
+      await _showInsufficientGoldDialog(playerBefore.gold);
+      return;
+    }
+    final expReward = applySupplies
+        ? (difficulty.expReward * _trailSuppliesMultiplier).floor()
+        : difficulty.expReward;
+    final goldReward = applySupplies
+        ? (difficulty.goldReward * _trailSuppliesMultiplier).floor()
+        : difficulty.goldReward;
+    final goldCost = applySupplies ? _trailSuppliesCost : 0;
+
     setState(() => _isStarting = true);
     final result = await ref
         .read(playerControllerProvider.notifier)
         .spendOnAdventure(
           energyCost: difficulty.energyCost,
-          expReward: difficulty.expReward,
-          goldReward: difficulty.goldReward,
+          expReward: expReward,
+          goldReward: goldReward,
+          additionalGoldCost: goldCost,
         );
     if (!mounted) return;
     setState(() => _isStarting = false);
 
     switch (result) {
       case Ok(:final value):
+        setState(() => _useTrailSupplies = false);
         unawaited(
           ref
               .read(questControllerProvider.notifier)
@@ -65,21 +84,40 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
             adventureName: _adventure.name,
             difficultyLabel: difficulty.label,
             energySpent: difficulty.energyCost,
-            expGained: difficulty.expReward,
-            goldGained: difficulty.goldReward,
+            expGained: expReward,
+            goldGained: goldReward,
             levelBefore: playerBefore.level,
             playerAfter: value,
+            goldSpentOnSupplies: goldCost,
           ),
         );
       case Err(:final failure):
         if (failure.message == 'Not enough energy') {
           await _showInsufficientEnergyDialog(difficulty, playerBefore.energy);
+        } else if (failure.message == 'Not enough Gold') {
+          await _showInsufficientGoldDialog(playerBefore.gold);
         } else {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(failure.message)));
         }
     }
   }
+
+  Future<void> _showInsufficientGoldDialog(int currentGold) => showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Not enough Gold'),
+      content: Text(
+        'Trail Supplies cost $_trailSuppliesCost Gold. You have $currentGold.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Got it'),
+        ),
+      ],
+    ),
+  );
 
   Future<void> _showInsufficientEnergyDialog(
     AdventureDifficulty difficulty,
@@ -106,6 +144,19 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
   @override
   Widget build(BuildContext context) {
     final difficulty = _selectedDifficulty;
+    final player = switch (ref.watch(playerControllerProvider)?.value) {
+      Ok(:final value) => value,
+      _ => null,
+    };
+    final currentGold = player?.gold ?? 0;
+    final canAffordSupplies = currentGold >= _trailSuppliesCost;
+    final applySupplies = _useTrailSupplies && canAffordSupplies;
+    final displayedExp = applySupplies
+        ? (difficulty.expReward * _trailSuppliesMultiplier).floor()
+        : difficulty.expReward;
+    final displayedGold = applySupplies
+        ? (difficulty.goldReward * _trailSuppliesMultiplier).floor()
+        : difficulty.goldReward;
     return Scaffold(
       appBar: AppBar(title: const Text('Adventure')),
       body: SingleChildScrollView(
@@ -161,19 +212,37 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
                 Expanded(
                   child: _RewardCard(
                     icon: Icons.auto_graph,
-                    label: '+${difficulty.expReward} EXP',
+                    label: '+$displayedExp EXP',
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _RewardCard(
                     icon: Icons.monetization_on,
-                    label: '+${difficulty.goldReward} Gold',
+                    label: '+$displayedGold Gold',
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            CheckboxListTile(
+              value: applySupplies,
+              onChanged: canAffordSupplies
+                  ? (value) =>
+                        setState(() => _useTrailSupplies = value ?? false)
+                  : null,
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Use Trail Supplies (-30 Gold): +50% EXP & Gold this run',
+              ),
+              subtitle: Text(
+                canAffordSupplies
+                    ? 'You have $currentGold Gold'
+                    : 'Need $_trailSuppliesCost Gold — you have $currentGold',
+              ),
+            ),
+            const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _isStarting ? null : _startAdventure,
               icon: _isStarting

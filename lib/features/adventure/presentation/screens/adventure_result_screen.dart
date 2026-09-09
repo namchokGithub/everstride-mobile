@@ -40,6 +40,11 @@ class AdventureResultScreen extends StatelessWidget {
               ),
               _ResultRow(label: 'EXP gained', value: '+${result.expGained}'),
               _ResultRow(label: 'Gold gained', value: '+${result.goldGained}'),
+              if (result.usedTrailSupplies)
+                _ResultRow(
+                  label: 'Trail Supplies',
+                  value: '-${result.goldSpentOnSupplies}',
+                ),
               const SizedBox(height: 8),
               Text(
                 'Lv. ${result.playerAfter.level} — EXP ${result.playerAfter.exp}/${PlayerState.expToNextLevel(result.playerAfter.level)}',

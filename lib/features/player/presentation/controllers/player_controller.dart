@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/errors/result.dart';
 import '../../../../core/utils/app_logger.dart';
 import '../../../health/data/repositories/health_sync_repository_impl.dart';
@@ -21,6 +22,7 @@ final spendEnergyForAdventureUseCaseProvider =
     Provider<SpendEnergyForAdventureUseCase>((ref) {
       return SpendEnergyForAdventureUseCase(
         ref.watch(playerRepositoryProvider),
+        ref.watch(appDatabaseProvider),
       );
     });
 
@@ -119,6 +121,7 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
     required int energyCost,
     required int expReward,
     required int goldReward,
+    int additionalGoldCost = 0,
   }) {
     return _runExclusive(() async {
       final result = await ref
@@ -127,6 +130,7 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
             energyCost: energyCost,
             expReward: expReward,
             goldReward: goldReward,
+            additionalGoldCost: additionalGoldCost,
           );
       if (result case Ok()) {
         await _loadPlayer();

@@ -11,6 +11,7 @@ class AdventureResult {
     required this.goldGained,
     required this.levelBefore,
     required this.playerAfter,
+    this.goldSpentOnSupplies = 0,
   });
 
   final String adventureName;
@@ -20,6 +21,8 @@ class AdventureResult {
   final int goldGained;
   final int levelBefore;
   final PlayerState playerAfter;
+  final int goldSpentOnSupplies;
 
   bool get leveledUp => playerAfter.level > levelBefore;
+  bool get usedTrailSupplies => goldSpentOnSupplies > 0;
 }
