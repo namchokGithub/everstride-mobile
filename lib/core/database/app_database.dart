@@ -30,7 +30,8 @@ class Player extends Table {
   IntColumn get energy => integer()();
   IntColumn get gold => integer()();
   IntColumn get pendingSteps => integer()();
-  BoolColumn get hasReconciledHistoricalSteps => boolean().withDefault(const Constant(false))();
+  BoolColumn get hasReconciledHistoricalSteps =>
+      boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -38,34 +39,48 @@ class Player extends Table {
 
 class AppSettings extends Table {
   IntColumn get id => integer()();
-  BoolColumn get onboardingCompleted => boolean().withDefault(const Constant(false))();
+  BoolColumn get onboardingCompleted =>
+      boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [HealthDaily, Player, AppSettings])
+/// Debug-only cursor for Health Connect step records. It prevents debug
+/// inserts from reusing a time window after the app process restarts.
+class DebugStepSeedCursors extends Table {
+  TextColumn get date => text()();
+  IntColumn get nextSlot => integer()();
+
+  @override
+  Set<Column> get primaryKey => {date};
+}
+
+@DriftDatabase(tables: [HealthDaily, Player, AppSettings, DebugStepSeedCursors])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) => m.createAll(),
-        onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.createTable(player);
-          }
-          if (from < 3) {
-            await m.createTable(appSettings);
-          }
-          if (from < 4) {
-            await m.addColumn(player, player.hasReconciledHistoricalSteps);
-          }
-        },
-      );
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(player);
+      }
+      if (from < 3) {
+        await m.createTable(appSettings);
+      }
+      if (from < 4) {
+        await m.addColumn(player, player.hasReconciledHistoricalSteps);
+      }
+      if (from < 5) {
+        await m.createTable(debugStepSeedCursors);
+      }
+    },
+  );
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(() async {

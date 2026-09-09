@@ -1010,12 +1010,232 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $DebugStepSeedCursorsTable extends DebugStepSeedCursors
+    with TableInfo<$DebugStepSeedCursorsTable, DebugStepSeedCursor> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DebugStepSeedCursorsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nextSlotMeta = const VerificationMeta(
+    'nextSlot',
+  );
+  @override
+  late final GeneratedColumn<int> nextSlot = GeneratedColumn<int>(
+    'next_slot',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [date, nextSlot];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'debug_step_seed_cursors';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DebugStepSeedCursor> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('next_slot')) {
+      context.handle(
+        _nextSlotMeta,
+        nextSlot.isAcceptableOrUnknown(data['next_slot']!, _nextSlotMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nextSlotMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {date};
+  @override
+  DebugStepSeedCursor map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DebugStepSeedCursor(
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      nextSlot: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}next_slot'],
+      )!,
+    );
+  }
+
+  @override
+  $DebugStepSeedCursorsTable createAlias(String alias) {
+    return $DebugStepSeedCursorsTable(attachedDatabase, alias);
+  }
+}
+
+class DebugStepSeedCursor extends DataClass
+    implements Insertable<DebugStepSeedCursor> {
+  final String date;
+  final int nextSlot;
+  const DebugStepSeedCursor({required this.date, required this.nextSlot});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date'] = Variable<String>(date);
+    map['next_slot'] = Variable<int>(nextSlot);
+    return map;
+  }
+
+  DebugStepSeedCursorsCompanion toCompanion(bool nullToAbsent) {
+    return DebugStepSeedCursorsCompanion(
+      date: Value(date),
+      nextSlot: Value(nextSlot),
+    );
+  }
+
+  factory DebugStepSeedCursor.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DebugStepSeedCursor(
+      date: serializer.fromJson<String>(json['date']),
+      nextSlot: serializer.fromJson<int>(json['nextSlot']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'date': serializer.toJson<String>(date),
+      'nextSlot': serializer.toJson<int>(nextSlot),
+    };
+  }
+
+  DebugStepSeedCursor copyWith({String? date, int? nextSlot}) =>
+      DebugStepSeedCursor(
+        date: date ?? this.date,
+        nextSlot: nextSlot ?? this.nextSlot,
+      );
+  DebugStepSeedCursor copyWithCompanion(DebugStepSeedCursorsCompanion data) {
+    return DebugStepSeedCursor(
+      date: data.date.present ? data.date.value : this.date,
+      nextSlot: data.nextSlot.present ? data.nextSlot.value : this.nextSlot,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DebugStepSeedCursor(')
+          ..write('date: $date, ')
+          ..write('nextSlot: $nextSlot')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(date, nextSlot);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DebugStepSeedCursor &&
+          other.date == this.date &&
+          other.nextSlot == this.nextSlot);
+}
+
+class DebugStepSeedCursorsCompanion
+    extends UpdateCompanion<DebugStepSeedCursor> {
+  final Value<String> date;
+  final Value<int> nextSlot;
+  final Value<int> rowid;
+  const DebugStepSeedCursorsCompanion({
+    this.date = const Value.absent(),
+    this.nextSlot = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DebugStepSeedCursorsCompanion.insert({
+    required String date,
+    required int nextSlot,
+    this.rowid = const Value.absent(),
+  }) : date = Value(date),
+       nextSlot = Value(nextSlot);
+  static Insertable<DebugStepSeedCursor> custom({
+    Expression<String>? date,
+    Expression<int>? nextSlot,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (date != null) 'date': date,
+      if (nextSlot != null) 'next_slot': nextSlot,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DebugStepSeedCursorsCompanion copyWith({
+    Value<String>? date,
+    Value<int>? nextSlot,
+    Value<int>? rowid,
+  }) {
+    return DebugStepSeedCursorsCompanion(
+      date: date ?? this.date,
+      nextSlot: nextSlot ?? this.nextSlot,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (nextSlot.present) {
+      map['next_slot'] = Variable<int>(nextSlot.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DebugStepSeedCursorsCompanion(')
+          ..write('date: $date, ')
+          ..write('nextSlot: $nextSlot, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $HealthDailyTable healthDaily = $HealthDailyTable(this);
   late final $PlayerTable player = $PlayerTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $DebugStepSeedCursorsTable debugStepSeedCursors =
+      $DebugStepSeedCursorsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1024,6 +1244,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     healthDaily,
     player,
     appSettings,
+    debugStepSeedCursors,
   ];
 }
 
@@ -1608,6 +1829,176 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$DebugStepSeedCursorsTableCreateCompanionBuilder =
+    DebugStepSeedCursorsCompanion Function({
+      required String date,
+      required int nextSlot,
+      Value<int> rowid,
+    });
+typedef $$DebugStepSeedCursorsTableUpdateCompanionBuilder =
+    DebugStepSeedCursorsCompanion Function({
+      Value<String> date,
+      Value<int> nextSlot,
+      Value<int> rowid,
+    });
+
+class $$DebugStepSeedCursorsTableFilterComposer
+    extends Composer<_$AppDatabase, $DebugStepSeedCursorsTable> {
+  $$DebugStepSeedCursorsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nextSlot => $composableBuilder(
+    column: $table.nextSlot,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DebugStepSeedCursorsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DebugStepSeedCursorsTable> {
+  $$DebugStepSeedCursorsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nextSlot => $composableBuilder(
+    column: $table.nextSlot,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DebugStepSeedCursorsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DebugStepSeedCursorsTable> {
+  $$DebugStepSeedCursorsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get nextSlot =>
+      $composableBuilder(column: $table.nextSlot, builder: (column) => column);
+}
+
+class $$DebugStepSeedCursorsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DebugStepSeedCursorsTable,
+          DebugStepSeedCursor,
+          $$DebugStepSeedCursorsTableFilterComposer,
+          $$DebugStepSeedCursorsTableOrderingComposer,
+          $$DebugStepSeedCursorsTableAnnotationComposer,
+          $$DebugStepSeedCursorsTableCreateCompanionBuilder,
+          $$DebugStepSeedCursorsTableUpdateCompanionBuilder,
+          (
+            DebugStepSeedCursor,
+            BaseReferences<
+              _$AppDatabase,
+              $DebugStepSeedCursorsTable,
+              DebugStepSeedCursor
+            >,
+          ),
+          DebugStepSeedCursor,
+          PrefetchHooks Function()
+        > {
+  $$DebugStepSeedCursorsTableTableManager(
+    _$AppDatabase db,
+    $DebugStepSeedCursorsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DebugStepSeedCursorsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DebugStepSeedCursorsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DebugStepSeedCursorsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> date = const Value.absent(),
+                Value<int> nextSlot = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DebugStepSeedCursorsCompanion(
+                date: date,
+                nextSlot: nextSlot,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String date,
+                required int nextSlot,
+                Value<int> rowid = const Value.absent(),
+              }) => DebugStepSeedCursorsCompanion.insert(
+                date: date,
+                nextSlot: nextSlot,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DebugStepSeedCursorsTable, DebugStepSeedCursor>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DebugStepSeedCursorsTable,
+                    DebugStepSeedCursor
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DebugStepSeedCursorsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DebugStepSeedCursorsTable,
+      DebugStepSeedCursor,
+      $$DebugStepSeedCursorsTableFilterComposer,
+      $$DebugStepSeedCursorsTableOrderingComposer,
+      $$DebugStepSeedCursorsTableAnnotationComposer,
+      $$DebugStepSeedCursorsTableCreateCompanionBuilder,
+      $$DebugStepSeedCursorsTableUpdateCompanionBuilder,
+      (
+        DebugStepSeedCursor,
+        BaseReferences<
+          _$AppDatabase,
+          $DebugStepSeedCursorsTable,
+          DebugStepSeedCursor
+        >,
+      ),
+      DebugStepSeedCursor,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1618,4 +2009,6 @@ class $AppDatabaseManager {
       $$PlayerTableTableManager(_db, _db.player);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$DebugStepSeedCursorsTableTableManager get debugStepSeedCursors =>
+      $$DebugStepSeedCursorsTableTableManager(_db, _db.debugStepSeedCursors);
 }
