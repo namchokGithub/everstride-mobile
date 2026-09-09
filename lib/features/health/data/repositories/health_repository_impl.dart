@@ -16,11 +16,20 @@ class HealthRepositoryImpl implements HealthRepository {
     try {
       final status = await _dataSource.getSdkStatus();
       final available = status == HealthConnectSdkStatus.sdkAvailable;
-      AppLogger.debug('health.availability', 'Health Connect status: $status (available: $available)');
+      AppLogger.debug(
+        'health.availability',
+        'Health Connect status: $status (available: $available)',
+      );
       return Ok(available);
     } catch (e) {
-      AppLogger.error('health.availability', 'Failed to check Health Connect availability', e);
-      return Err(Failure('Failed to check Health Connect availability', cause: e));
+      AppLogger.error(
+        'health.availability',
+        'Failed to check Health Connect availability',
+        e,
+      );
+      return Err(
+        Failure('Failed to check Health Connect availability', cause: e),
+      );
     }
   }
 
@@ -28,11 +37,20 @@ class HealthRepositoryImpl implements HealthRepository {
   Future<Result<bool>> promptInstallOrUpdate() async {
     try {
       await _dataSource.promptInstallOrUpdate();
-      AppLogger.debug('health.availability', 'Opened Health Connect install/update flow');
+      AppLogger.debug(
+        'health.availability',
+        'Opened Health Connect install/update flow',
+      );
       return const Ok(true);
     } catch (e) {
-      AppLogger.error('health.availability', 'Failed to open Health Connect install/update', e);
-      return Err(Failure('Failed to open Health Connect install/update', cause: e));
+      AppLogger.error(
+        'health.availability',
+        'Failed to open Health Connect install/update',
+        e,
+      );
+      return Err(
+        Failure('Failed to open Health Connect install/update', cause: e),
+      );
     }
   }
 
@@ -40,10 +58,17 @@ class HealthRepositoryImpl implements HealthRepository {
   Future<Result<bool>> hasPermission() async {
     try {
       final granted = await _dataSource.hasStepsPermission();
-      AppLogger.debug('health.permission', 'Current steps permission status: $granted');
+      AppLogger.debug(
+        'health.permission',
+        'Current steps permission status: $granted',
+      );
       return Ok(granted);
     } catch (e) {
-      AppLogger.error('health.permission', 'Failed to check current permission status', e);
+      AppLogger.error(
+        'health.permission',
+        'Failed to check current permission status',
+        e,
+      );
       return Err(Failure('Failed to check permission status', cause: e));
     }
   }
@@ -52,15 +77,27 @@ class HealthRepositoryImpl implements HealthRepository {
   Future<Result<bool>> requestPermissions() async {
     try {
       if (await _dataSource.hasStepsPermission()) {
-        AppLogger.debug('health.permission', 'Steps permission already granted');
+        AppLogger.debug(
+          'health.permission',
+          'Steps permission already granted',
+        );
         return const Ok(true);
       }
       final granted = await _dataSource.requestStepsPermission();
-      AppLogger.debug('health.permission', 'Steps permission request result: $granted');
+      AppLogger.debug(
+        'health.permission',
+        'Steps permission request result: $granted',
+      );
       return Ok(granted);
     } catch (e) {
-      AppLogger.error('health.permission', 'Failed to request Health Connect permissions', e);
-      return Err(Failure('Failed to request Health Connect permissions', cause: e));
+      AppLogger.error(
+        'health.permission',
+        'Failed to request Health Connect permissions',
+        e,
+      );
+      return Err(
+        Failure('Failed to request Health Connect permissions', cause: e),
+      );
     }
   }
 
@@ -75,10 +112,17 @@ class HealthRepositoryImpl implements HealthRepository {
       // midnight across a DST transition (a 23- or 25-hour local day).
       final end = DateTime(start.year, start.month, start.day + 1);
       final steps = await _dataSource.getTotalSteps(start: start, end: end);
-      AppLogger.debug('health.query', 'Read $steps steps for ${start.toIso8601String().split('T').first}');
+      AppLogger.debug(
+        'health.query',
+        'Read $steps steps for ${start.toIso8601String().split('T').first}',
+      );
       return Ok(steps);
     } catch (e) {
-      AppLogger.error('health.query', 'Failed to read steps for ${date.toIso8601String().split('T').first}', e);
+      AppLogger.error(
+        'health.query',
+        'Failed to read steps for ${date.toIso8601String().split('T').first}',
+        e,
+      );
       return Err(Failure('Failed to read steps', cause: e));
     }
   }

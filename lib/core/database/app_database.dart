@@ -56,12 +56,36 @@ class DebugStepSeedCursors extends Table {
   Set<Column> get primaryKey => {date};
 }
 
-@DriftDatabase(tables: [HealthDaily, Player, AppSettings, DebugStepSeedCursors])
+class DailyQuestInstances extends Table {
+  TextColumn get id => text()();
+  TextColumn get questId => text()();
+  TextColumn get date => text()();
+  TextColumn get objectiveType => text()();
+  IntColumn get target => integer()();
+  IntColumn get progress => integer()();
+  TextColumn get status => text()();
+  IntColumn get expReward => integer()();
+  IntColumn get goldReward => integer()();
+  DateTimeColumn get claimedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(
+  tables: [
+    HealthDaily,
+    Player,
+    AppSettings,
+    DebugStepSeedCursors,
+    DailyQuestInstances,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -78,6 +102,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.createTable(debugStepSeedCursors);
+      }
+      if (from < 6) {
+        await m.createTable(dailyQuestInstances);
       }
     },
   );

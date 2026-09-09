@@ -25,12 +25,14 @@ void main() {
 
   test('upsertRecord then getRecord round-trips the same values', () async {
     final date = DateTime(2026, 9, 8);
-    final upsertResult = await repository.upsertRecord(HealthDailyRecord(
-      date: date,
-      totalSteps: 1000,
-      rewardedSteps: 400,
-      lastSyncedAt: date,
-    ));
+    final upsertResult = await repository.upsertRecord(
+      HealthDailyRecord(
+        date: date,
+        totalSteps: 1000,
+        rewardedSteps: 400,
+        lastSyncedAt: date,
+      ),
+    );
     expect(upsertResult, isA<Ok<bool>>());
 
     final getResult = await repository.getRecord(date);
@@ -42,18 +44,22 @@ void main() {
 
   test('upsertRecord overwrites the existing row for the same date', () async {
     final date = DateTime(2026, 9, 8);
-    await repository.upsertRecord(HealthDailyRecord(
-      date: date,
-      totalSteps: 1000,
-      rewardedSteps: 400,
-      lastSyncedAt: date,
-    ));
-    await repository.upsertRecord(HealthDailyRecord(
-      date: date,
-      totalSteps: 1500,
-      rewardedSteps: 900,
-      lastSyncedAt: date,
-    ));
+    await repository.upsertRecord(
+      HealthDailyRecord(
+        date: date,
+        totalSteps: 1000,
+        rewardedSteps: 400,
+        lastSyncedAt: date,
+      ),
+    );
+    await repository.upsertRecord(
+      HealthDailyRecord(
+        date: date,
+        totalSteps: 1500,
+        rewardedSteps: 900,
+        lastSyncedAt: date,
+      ),
+    );
 
     final getResult = await repository.getRecord(date);
     final record = (getResult as Ok<HealthDailyRecord?>).value!;
@@ -61,21 +67,28 @@ void main() {
     expect(record.rewardedSteps, 900);
   });
 
-  test('getMostRecentSyncedDate returns the latest date across multiple rows', () async {
-    await repository.upsertRecord(HealthDailyRecord(
-      date: DateTime(2026, 9, 5),
-      totalSteps: 100,
-      rewardedSteps: 100,
-      lastSyncedAt: DateTime(2026, 9, 5),
-    ));
-    await repository.upsertRecord(HealthDailyRecord(
-      date: DateTime(2026, 9, 7),
-      totalSteps: 200,
-      rewardedSteps: 200,
-      lastSyncedAt: DateTime(2026, 9, 7),
-    ));
+  test(
+    'getMostRecentSyncedDate returns the latest date across multiple rows',
+    () async {
+      await repository.upsertRecord(
+        HealthDailyRecord(
+          date: DateTime(2026, 9, 5),
+          totalSteps: 100,
+          rewardedSteps: 100,
+          lastSyncedAt: DateTime(2026, 9, 5),
+        ),
+      );
+      await repository.upsertRecord(
+        HealthDailyRecord(
+          date: DateTime(2026, 9, 7),
+          totalSteps: 200,
+          rewardedSteps: 200,
+          lastSyncedAt: DateTime(2026, 9, 7),
+        ),
+      );
 
-    final result = await repository.getMostRecentSyncedDate();
-    expect((result as Ok<DateTime?>).value, DateTime(2026, 9, 7));
-  });
+      final result = await repository.getMostRecentSyncedDate();
+      expect((result as Ok<DateTime?>).value, DateTime(2026, 9, 7));
+    },
+  );
 }

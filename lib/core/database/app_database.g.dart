@@ -1228,6 +1228,617 @@ class DebugStepSeedCursorsCompanion
   }
 }
 
+class $DailyQuestInstancesTable extends DailyQuestInstances
+    with TableInfo<$DailyQuestInstancesTable, DailyQuestInstance> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyQuestInstancesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _questIdMeta = const VerificationMeta(
+    'questId',
+  );
+  @override
+  late final GeneratedColumn<String> questId = GeneratedColumn<String>(
+    'quest_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _objectiveTypeMeta = const VerificationMeta(
+    'objectiveType',
+  );
+  @override
+  late final GeneratedColumn<String> objectiveType = GeneratedColumn<String>(
+    'objective_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetMeta = const VerificationMeta('target');
+  @override
+  late final GeneratedColumn<int> target = GeneratedColumn<int>(
+    'target',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _progressMeta = const VerificationMeta(
+    'progress',
+  );
+  @override
+  late final GeneratedColumn<int> progress = GeneratedColumn<int>(
+    'progress',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expRewardMeta = const VerificationMeta(
+    'expReward',
+  );
+  @override
+  late final GeneratedColumn<int> expReward = GeneratedColumn<int>(
+    'exp_reward',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _goldRewardMeta = const VerificationMeta(
+    'goldReward',
+  );
+  @override
+  late final GeneratedColumn<int> goldReward = GeneratedColumn<int>(
+    'gold_reward',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _claimedAtMeta = const VerificationMeta(
+    'claimedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> claimedAt = GeneratedColumn<DateTime>(
+    'claimed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    questId,
+    date,
+    objectiveType,
+    target,
+    progress,
+    status,
+    expReward,
+    goldReward,
+    claimedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_quest_instances';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyQuestInstance> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('quest_id')) {
+      context.handle(
+        _questIdMeta,
+        questId.isAcceptableOrUnknown(data['quest_id']!, _questIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_questIdMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('objective_type')) {
+      context.handle(
+        _objectiveTypeMeta,
+        objectiveType.isAcceptableOrUnknown(
+          data['objective_type']!,
+          _objectiveTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_objectiveTypeMeta);
+    }
+    if (data.containsKey('target')) {
+      context.handle(
+        _targetMeta,
+        target.isAcceptableOrUnknown(data['target']!, _targetMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_targetMeta);
+    }
+    if (data.containsKey('progress')) {
+      context.handle(
+        _progressMeta,
+        progress.isAcceptableOrUnknown(data['progress']!, _progressMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_progressMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('exp_reward')) {
+      context.handle(
+        _expRewardMeta,
+        expReward.isAcceptableOrUnknown(data['exp_reward']!, _expRewardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_expRewardMeta);
+    }
+    if (data.containsKey('gold_reward')) {
+      context.handle(
+        _goldRewardMeta,
+        goldReward.isAcceptableOrUnknown(data['gold_reward']!, _goldRewardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_goldRewardMeta);
+    }
+    if (data.containsKey('claimed_at')) {
+      context.handle(
+        _claimedAtMeta,
+        claimedAt.isAcceptableOrUnknown(data['claimed_at']!, _claimedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyQuestInstance map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyQuestInstance(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      questId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quest_id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      objectiveType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}objective_type'],
+      )!,
+      target: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target'],
+      )!,
+      progress: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}progress'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      expReward: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}exp_reward'],
+      )!,
+      goldReward: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gold_reward'],
+      )!,
+      claimedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}claimed_at'],
+      ),
+    );
+  }
+
+  @override
+  $DailyQuestInstancesTable createAlias(String alias) {
+    return $DailyQuestInstancesTable(attachedDatabase, alias);
+  }
+}
+
+class DailyQuestInstance extends DataClass
+    implements Insertable<DailyQuestInstance> {
+  final String id;
+  final String questId;
+  final String date;
+  final String objectiveType;
+  final int target;
+  final int progress;
+  final String status;
+  final int expReward;
+  final int goldReward;
+  final DateTime? claimedAt;
+  const DailyQuestInstance({
+    required this.id,
+    required this.questId,
+    required this.date,
+    required this.objectiveType,
+    required this.target,
+    required this.progress,
+    required this.status,
+    required this.expReward,
+    required this.goldReward,
+    this.claimedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['quest_id'] = Variable<String>(questId);
+    map['date'] = Variable<String>(date);
+    map['objective_type'] = Variable<String>(objectiveType);
+    map['target'] = Variable<int>(target);
+    map['progress'] = Variable<int>(progress);
+    map['status'] = Variable<String>(status);
+    map['exp_reward'] = Variable<int>(expReward);
+    map['gold_reward'] = Variable<int>(goldReward);
+    if (!nullToAbsent || claimedAt != null) {
+      map['claimed_at'] = Variable<DateTime>(claimedAt);
+    }
+    return map;
+  }
+
+  DailyQuestInstancesCompanion toCompanion(bool nullToAbsent) {
+    return DailyQuestInstancesCompanion(
+      id: Value(id),
+      questId: Value(questId),
+      date: Value(date),
+      objectiveType: Value(objectiveType),
+      target: Value(target),
+      progress: Value(progress),
+      status: Value(status),
+      expReward: Value(expReward),
+      goldReward: Value(goldReward),
+      claimedAt: claimedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(claimedAt),
+    );
+  }
+
+  factory DailyQuestInstance.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyQuestInstance(
+      id: serializer.fromJson<String>(json['id']),
+      questId: serializer.fromJson<String>(json['questId']),
+      date: serializer.fromJson<String>(json['date']),
+      objectiveType: serializer.fromJson<String>(json['objectiveType']),
+      target: serializer.fromJson<int>(json['target']),
+      progress: serializer.fromJson<int>(json['progress']),
+      status: serializer.fromJson<String>(json['status']),
+      expReward: serializer.fromJson<int>(json['expReward']),
+      goldReward: serializer.fromJson<int>(json['goldReward']),
+      claimedAt: serializer.fromJson<DateTime?>(json['claimedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'questId': serializer.toJson<String>(questId),
+      'date': serializer.toJson<String>(date),
+      'objectiveType': serializer.toJson<String>(objectiveType),
+      'target': serializer.toJson<int>(target),
+      'progress': serializer.toJson<int>(progress),
+      'status': serializer.toJson<String>(status),
+      'expReward': serializer.toJson<int>(expReward),
+      'goldReward': serializer.toJson<int>(goldReward),
+      'claimedAt': serializer.toJson<DateTime?>(claimedAt),
+    };
+  }
+
+  DailyQuestInstance copyWith({
+    String? id,
+    String? questId,
+    String? date,
+    String? objectiveType,
+    int? target,
+    int? progress,
+    String? status,
+    int? expReward,
+    int? goldReward,
+    Value<DateTime?> claimedAt = const Value.absent(),
+  }) => DailyQuestInstance(
+    id: id ?? this.id,
+    questId: questId ?? this.questId,
+    date: date ?? this.date,
+    objectiveType: objectiveType ?? this.objectiveType,
+    target: target ?? this.target,
+    progress: progress ?? this.progress,
+    status: status ?? this.status,
+    expReward: expReward ?? this.expReward,
+    goldReward: goldReward ?? this.goldReward,
+    claimedAt: claimedAt.present ? claimedAt.value : this.claimedAt,
+  );
+  DailyQuestInstance copyWithCompanion(DailyQuestInstancesCompanion data) {
+    return DailyQuestInstance(
+      id: data.id.present ? data.id.value : this.id,
+      questId: data.questId.present ? data.questId.value : this.questId,
+      date: data.date.present ? data.date.value : this.date,
+      objectiveType: data.objectiveType.present
+          ? data.objectiveType.value
+          : this.objectiveType,
+      target: data.target.present ? data.target.value : this.target,
+      progress: data.progress.present ? data.progress.value : this.progress,
+      status: data.status.present ? data.status.value : this.status,
+      expReward: data.expReward.present ? data.expReward.value : this.expReward,
+      goldReward: data.goldReward.present
+          ? data.goldReward.value
+          : this.goldReward,
+      claimedAt: data.claimedAt.present ? data.claimedAt.value : this.claimedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyQuestInstance(')
+          ..write('id: $id, ')
+          ..write('questId: $questId, ')
+          ..write('date: $date, ')
+          ..write('objectiveType: $objectiveType, ')
+          ..write('target: $target, ')
+          ..write('progress: $progress, ')
+          ..write('status: $status, ')
+          ..write('expReward: $expReward, ')
+          ..write('goldReward: $goldReward, ')
+          ..write('claimedAt: $claimedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    questId,
+    date,
+    objectiveType,
+    target,
+    progress,
+    status,
+    expReward,
+    goldReward,
+    claimedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyQuestInstance &&
+          other.id == this.id &&
+          other.questId == this.questId &&
+          other.date == this.date &&
+          other.objectiveType == this.objectiveType &&
+          other.target == this.target &&
+          other.progress == this.progress &&
+          other.status == this.status &&
+          other.expReward == this.expReward &&
+          other.goldReward == this.goldReward &&
+          other.claimedAt == this.claimedAt);
+}
+
+class DailyQuestInstancesCompanion extends UpdateCompanion<DailyQuestInstance> {
+  final Value<String> id;
+  final Value<String> questId;
+  final Value<String> date;
+  final Value<String> objectiveType;
+  final Value<int> target;
+  final Value<int> progress;
+  final Value<String> status;
+  final Value<int> expReward;
+  final Value<int> goldReward;
+  final Value<DateTime?> claimedAt;
+  final Value<int> rowid;
+  const DailyQuestInstancesCompanion({
+    this.id = const Value.absent(),
+    this.questId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.objectiveType = const Value.absent(),
+    this.target = const Value.absent(),
+    this.progress = const Value.absent(),
+    this.status = const Value.absent(),
+    this.expReward = const Value.absent(),
+    this.goldReward = const Value.absent(),
+    this.claimedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DailyQuestInstancesCompanion.insert({
+    required String id,
+    required String questId,
+    required String date,
+    required String objectiveType,
+    required int target,
+    required int progress,
+    required String status,
+    required int expReward,
+    required int goldReward,
+    this.claimedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       questId = Value(questId),
+       date = Value(date),
+       objectiveType = Value(objectiveType),
+       target = Value(target),
+       progress = Value(progress),
+       status = Value(status),
+       expReward = Value(expReward),
+       goldReward = Value(goldReward);
+  static Insertable<DailyQuestInstance> custom({
+    Expression<String>? id,
+    Expression<String>? questId,
+    Expression<String>? date,
+    Expression<String>? objectiveType,
+    Expression<int>? target,
+    Expression<int>? progress,
+    Expression<String>? status,
+    Expression<int>? expReward,
+    Expression<int>? goldReward,
+    Expression<DateTime>? claimedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (questId != null) 'quest_id': questId,
+      if (date != null) 'date': date,
+      if (objectiveType != null) 'objective_type': objectiveType,
+      if (target != null) 'target': target,
+      if (progress != null) 'progress': progress,
+      if (status != null) 'status': status,
+      if (expReward != null) 'exp_reward': expReward,
+      if (goldReward != null) 'gold_reward': goldReward,
+      if (claimedAt != null) 'claimed_at': claimedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DailyQuestInstancesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? questId,
+    Value<String>? date,
+    Value<String>? objectiveType,
+    Value<int>? target,
+    Value<int>? progress,
+    Value<String>? status,
+    Value<int>? expReward,
+    Value<int>? goldReward,
+    Value<DateTime?>? claimedAt,
+    Value<int>? rowid,
+  }) {
+    return DailyQuestInstancesCompanion(
+      id: id ?? this.id,
+      questId: questId ?? this.questId,
+      date: date ?? this.date,
+      objectiveType: objectiveType ?? this.objectiveType,
+      target: target ?? this.target,
+      progress: progress ?? this.progress,
+      status: status ?? this.status,
+      expReward: expReward ?? this.expReward,
+      goldReward: goldReward ?? this.goldReward,
+      claimedAt: claimedAt ?? this.claimedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (questId.present) {
+      map['quest_id'] = Variable<String>(questId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (objectiveType.present) {
+      map['objective_type'] = Variable<String>(objectiveType.value);
+    }
+    if (target.present) {
+      map['target'] = Variable<int>(target.value);
+    }
+    if (progress.present) {
+      map['progress'] = Variable<int>(progress.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (expReward.present) {
+      map['exp_reward'] = Variable<int>(expReward.value);
+    }
+    if (goldReward.present) {
+      map['gold_reward'] = Variable<int>(goldReward.value);
+    }
+    if (claimedAt.present) {
+      map['claimed_at'] = Variable<DateTime>(claimedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyQuestInstancesCompanion(')
+          ..write('id: $id, ')
+          ..write('questId: $questId, ')
+          ..write('date: $date, ')
+          ..write('objectiveType: $objectiveType, ')
+          ..write('target: $target, ')
+          ..write('progress: $progress, ')
+          ..write('status: $status, ')
+          ..write('expReward: $expReward, ')
+          ..write('goldReward: $goldReward, ')
+          ..write('claimedAt: $claimedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1236,6 +1847,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $DebugStepSeedCursorsTable debugStepSeedCursors =
       $DebugStepSeedCursorsTable(this);
+  late final $DailyQuestInstancesTable dailyQuestInstances =
+      $DailyQuestInstancesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1245,6 +1858,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     player,
     appSettings,
     debugStepSeedCursors,
+    dailyQuestInstances,
   ];
 }
 
@@ -1999,6 +2613,332 @@ typedef $$DebugStepSeedCursorsTableProcessedTableManager =
       DebugStepSeedCursor,
       PrefetchHooks Function()
     >;
+typedef $$DailyQuestInstancesTableCreateCompanionBuilder =
+    DailyQuestInstancesCompanion Function({
+      required String id,
+      required String questId,
+      required String date,
+      required String objectiveType,
+      required int target,
+      required int progress,
+      required String status,
+      required int expReward,
+      required int goldReward,
+      Value<DateTime?> claimedAt,
+      Value<int> rowid,
+    });
+typedef $$DailyQuestInstancesTableUpdateCompanionBuilder =
+    DailyQuestInstancesCompanion Function({
+      Value<String> id,
+      Value<String> questId,
+      Value<String> date,
+      Value<String> objectiveType,
+      Value<int> target,
+      Value<int> progress,
+      Value<String> status,
+      Value<int> expReward,
+      Value<int> goldReward,
+      Value<DateTime?> claimedAt,
+      Value<int> rowid,
+    });
+
+class $$DailyQuestInstancesTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyQuestInstancesTable> {
+  $$DailyQuestInstancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questId => $composableBuilder(
+    column: $table.questId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get objectiveType => $composableBuilder(
+    column: $table.objectiveType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get target => $composableBuilder(
+    column: $table.target,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get progress => $composableBuilder(
+    column: $table.progress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expReward => $composableBuilder(
+    column: $table.expReward,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get goldReward => $composableBuilder(
+    column: $table.goldReward,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get claimedAt => $composableBuilder(
+    column: $table.claimedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DailyQuestInstancesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyQuestInstancesTable> {
+  $$DailyQuestInstancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questId => $composableBuilder(
+    column: $table.questId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get objectiveType => $composableBuilder(
+    column: $table.objectiveType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get target => $composableBuilder(
+    column: $table.target,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get progress => $composableBuilder(
+    column: $table.progress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expReward => $composableBuilder(
+    column: $table.expReward,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get goldReward => $composableBuilder(
+    column: $table.goldReward,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get claimedAt => $composableBuilder(
+    column: $table.claimedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DailyQuestInstancesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyQuestInstancesTable> {
+  $$DailyQuestInstancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get questId =>
+      $composableBuilder(column: $table.questId, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get objectiveType => $composableBuilder(
+    column: $table.objectiveType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get target =>
+      $composableBuilder(column: $table.target, builder: (column) => column);
+
+  GeneratedColumn<int> get progress =>
+      $composableBuilder(column: $table.progress, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get expReward =>
+      $composableBuilder(column: $table.expReward, builder: (column) => column);
+
+  GeneratedColumn<int> get goldReward => $composableBuilder(
+    column: $table.goldReward,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get claimedAt =>
+      $composableBuilder(column: $table.claimedAt, builder: (column) => column);
+}
+
+class $$DailyQuestInstancesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyQuestInstancesTable,
+          DailyQuestInstance,
+          $$DailyQuestInstancesTableFilterComposer,
+          $$DailyQuestInstancesTableOrderingComposer,
+          $$DailyQuestInstancesTableAnnotationComposer,
+          $$DailyQuestInstancesTableCreateCompanionBuilder,
+          $$DailyQuestInstancesTableUpdateCompanionBuilder,
+          (
+            DailyQuestInstance,
+            BaseReferences<
+              _$AppDatabase,
+              $DailyQuestInstancesTable,
+              DailyQuestInstance
+            >,
+          ),
+          DailyQuestInstance,
+          PrefetchHooks Function()
+        > {
+  $$DailyQuestInstancesTableTableManager(
+    _$AppDatabase db,
+    $DailyQuestInstancesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyQuestInstancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyQuestInstancesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DailyQuestInstancesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> questId = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<String> objectiveType = const Value.absent(),
+                Value<int> target = const Value.absent(),
+                Value<int> progress = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> expReward = const Value.absent(),
+                Value<int> goldReward = const Value.absent(),
+                Value<DateTime?> claimedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DailyQuestInstancesCompanion(
+                id: id,
+                questId: questId,
+                date: date,
+                objectiveType: objectiveType,
+                target: target,
+                progress: progress,
+                status: status,
+                expReward: expReward,
+                goldReward: goldReward,
+                claimedAt: claimedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String questId,
+                required String date,
+                required String objectiveType,
+                required int target,
+                required int progress,
+                required String status,
+                required int expReward,
+                required int goldReward,
+                Value<DateTime?> claimedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DailyQuestInstancesCompanion.insert(
+                id: id,
+                questId: questId,
+                date: date,
+                objectiveType: objectiveType,
+                target: target,
+                progress: progress,
+                status: status,
+                expReward: expReward,
+                goldReward: goldReward,
+                claimedAt: claimedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DailyQuestInstancesTable, DailyQuestInstance>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DailyQuestInstancesTable,
+                    DailyQuestInstance
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DailyQuestInstancesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DailyQuestInstancesTable,
+      DailyQuestInstance,
+      $$DailyQuestInstancesTableFilterComposer,
+      $$DailyQuestInstancesTableOrderingComposer,
+      $$DailyQuestInstancesTableAnnotationComposer,
+      $$DailyQuestInstancesTableCreateCompanionBuilder,
+      $$DailyQuestInstancesTableUpdateCompanionBuilder,
+      (
+        DailyQuestInstance,
+        BaseReferences<
+          _$AppDatabase,
+          $DailyQuestInstancesTable,
+          DailyQuestInstance
+        >,
+      ),
+      DailyQuestInstance,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2011,4 +2951,6 @@ class $AppDatabaseManager {
       $$AppSettingsTableTableManager(_db, _db.appSettings);
   $$DebugStepSeedCursorsTableTableManager get debugStepSeedCursors =>
       $$DebugStepSeedCursorsTableTableManager(_db, _db.debugStepSeedCursors);
+  $$DailyQuestInstancesTableTableManager get dailyQuestInstances =>
+      $$DailyQuestInstancesTableTableManager(_db, _db.dailyQuestInstances);
 }

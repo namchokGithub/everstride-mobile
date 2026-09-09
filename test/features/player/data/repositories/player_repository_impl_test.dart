@@ -58,7 +58,13 @@ void main() {
       const PlayerState(level: 1, exp: 0, energy: 0, gold: 0, pendingSteps: 0),
     );
     await repository.savePlayer(
-      const PlayerState(level: 2, exp: 10, energy: 5, gold: 30, pendingSteps: 15),
+      const PlayerState(
+        level: 2,
+        exp: 10,
+        energy: 5,
+        gold: 30,
+        pendingSteps: 15,
+      ),
     );
 
     final result = await repository.getPlayer();

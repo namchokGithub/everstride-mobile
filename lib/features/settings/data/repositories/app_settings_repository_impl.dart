@@ -16,7 +16,9 @@ class AppSettingsRepositoryImpl implements AppSettingsRepository {
   @override
   Future<Result<bool>> getOnboardingCompleted() async {
     try {
-      final row = await (_db.select(_db.appSettings)..where((t) => t.id.equals(_settingsId))).getSingleOrNull();
+      final row = await (_db.select(
+        _db.appSettings,
+      )..where((t) => t.id.equals(_settingsId))).getSingleOrNull();
       return Ok(row?.onboardingCompleted ?? false);
     } catch (e) {
       AppLogger.error('settings.state', 'Failed to read onboarding status', e);
@@ -27,7 +29,9 @@ class AppSettingsRepositoryImpl implements AppSettingsRepository {
   @override
   Future<Result<bool>> setOnboardingCompleted(bool value) async {
     try {
-      await _db.into(_db.appSettings).insertOnConflictUpdate(
+      await _db
+          .into(_db.appSettings)
+          .insertOnConflictUpdate(
             AppSettingsCompanion.insert(
               id: Value(_settingsId),
               onboardingCompleted: Value(value),

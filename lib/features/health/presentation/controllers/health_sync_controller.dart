@@ -19,7 +19,9 @@ class HealthSyncController extends Notifier<AsyncValue<Result<SyncResult>>?> {
 
   Future<void> sync() async {
     state = const AsyncValue.loading();
-    final result = await AsyncValue.guard(() => ref.read(syncHealthDataUseCaseProvider).call());
+    final result = await AsyncValue.guard(
+      () => ref.read(syncHealthDataUseCaseProvider).call(),
+    );
     if (result case AsyncData(value: Ok(:final value))) {
       AppLogger.debug(
         'health.sync',
@@ -33,4 +35,6 @@ class HealthSyncController extends Notifier<AsyncValue<Result<SyncResult>>?> {
 }
 
 final healthSyncControllerProvider =
-    NotifierProvider<HealthSyncController, AsyncValue<Result<SyncResult>>?>(HealthSyncController.new);
+    NotifierProvider<HealthSyncController, AsyncValue<Result<SyncResult>>?>(
+      HealthSyncController.new,
+    );

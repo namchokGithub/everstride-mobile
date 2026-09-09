@@ -16,19 +16,24 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Result<PlayerState>> getPlayer() async {
     try {
-      final row =
-          await (_db.select(_db.player)..where((t) => t.id.equals(_playerId))).getSingleOrNull();
+      final row = await (_db.select(
+        _db.player,
+      )..where((t) => t.id.equals(_playerId))).getSingleOrNull();
       if (row == null) {
-        return const Ok(PlayerState(level: 1, exp: 0, energy: 0, gold: 0, pendingSteps: 0));
+        return const Ok(
+          PlayerState(level: 1, exp: 0, energy: 0, gold: 0, pendingSteps: 0),
+        );
       }
-      return Ok(PlayerState(
-        level: row.level,
-        exp: row.exp,
-        energy: row.energy,
-        gold: row.gold,
-        pendingSteps: row.pendingSteps,
-        hasReconciledHistoricalSteps: row.hasReconciledHistoricalSteps,
-      ));
+      return Ok(
+        PlayerState(
+          level: row.level,
+          exp: row.exp,
+          energy: row.energy,
+          gold: row.gold,
+          pendingSteps: row.pendingSteps,
+          hasReconciledHistoricalSteps: row.hasReconciledHistoricalSteps,
+        ),
+      );
     } catch (e) {
       AppLogger.error('player.state', 'Failed to read player state', e);
       return Err(Failure('Failed to read player state', cause: e));
@@ -38,7 +43,9 @@ class PlayerRepositoryImpl implements PlayerRepository {
   @override
   Future<Result<bool>> savePlayer(PlayerState player) async {
     try {
-      await _db.into(_db.player).insertOnConflictUpdate(
+      await _db
+          .into(_db.player)
+          .insertOnConflictUpdate(
             PlayerCompanion(
               id: Value(_playerId),
               level: Value(player.level),
@@ -46,7 +53,9 @@ class PlayerRepositoryImpl implements PlayerRepository {
               energy: Value(player.energy),
               gold: Value(player.gold),
               pendingSteps: Value(player.pendingSteps),
-              hasReconciledHistoricalSteps: Value(player.hasReconciledHistoricalSteps),
+              hasReconciledHistoricalSteps: Value(
+                player.hasReconciledHistoricalSteps,
+              ),
             ),
           );
       AppLogger.debug(

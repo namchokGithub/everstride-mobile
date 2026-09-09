@@ -46,10 +46,12 @@ class _FailingSyncRepository implements HealthSyncRepository {
       const Err(Failure('simulated failure'));
 
   @override
-  Future<Result<HealthDailyRecord?>> getRecord(DateTime date) => throw UnimplementedError();
+  Future<Result<HealthDailyRecord?>> getRecord(DateTime date) =>
+      throw UnimplementedError();
 
   @override
-  Future<Result<bool>> upsertRecord(HealthDailyRecord record) => throw UnimplementedError();
+  Future<Result<bool>> upsertRecord(HealthDailyRecord record) =>
+      throw UnimplementedError();
 }
 
 void main() {
@@ -67,58 +69,88 @@ void main() {
 
   test('first sync of the day rewards the full total', () async {
     final today = DateTime(2026, 9, 8);
-    final useCase = SyncHealthDataUseCase(_FakeHealthRepository({today: 2500}), syncRepository);
+    final useCase = SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 2500}),
+      syncRepository,
+    );
 
     final result = await useCase.call(now: today);
     final syncResult = (result as Ok<SyncResult>).value;
 
     expect(syncResult.totalNewRewardableSteps, 2500);
     expect(syncResult.days.length, 7);
-    expect(syncResult.days.last, DailySyncResult(date: today, rewardableSteps: 2500));
+    expect(
+      syncResult.days.last,
+      DailySyncResult(date: today, rewardableSteps: 2500),
+    );
   });
 
-  test('second sync same day with the same total rewards nothing new', () async {
-    final today = DateTime(2026, 9, 8);
-    final useCase = SyncHealthDataUseCase(_FakeHealthRepository({today: 2500}), syncRepository);
+  test(
+    'second sync same day with the same total rewards nothing new',
+    () async {
+      final today = DateTime(2026, 9, 8);
+      final useCase = SyncHealthDataUseCase(
+        _FakeHealthRepository({today: 2500}),
+        syncRepository,
+      );
 
-    await useCase.call(now: today);
-    final result = await useCase.call(now: today);
-    final syncResult = (result as Ok<SyncResult>).value;
+      await useCase.call(now: today);
+      final result = await useCase.call(now: today);
+      final syncResult = (result as Ok<SyncResult>).value;
 
-    expect(syncResult.totalNewRewardableSteps, 0);
-  });
+      expect(syncResult.totalNewRewardableSteps, 0);
+    },
+  );
 
   test('an increased total rewards only the increase', () async {
     final today = DateTime(2026, 9, 8);
-    await SyncHealthDataUseCase(_FakeHealthRepository({today: 2500}), syncRepository).call(now: today);
+    await SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 2500}),
+      syncRepository,
+    ).call(now: today);
 
-    final result =
-        await SyncHealthDataUseCase(_FakeHealthRepository({today: 4000}), syncRepository).call(now: today);
+    final result = await SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 4000}),
+      syncRepository,
+    ).call(now: today);
     final syncResult = (result as Ok<SyncResult>).value;
 
     expect(syncResult.totalNewRewardableSteps, 1500);
   });
 
-  test('a decreased total (correction) rewards nothing and does not go negative', () async {
-    final today = DateTime(2026, 9, 8);
-    await SyncHealthDataUseCase(_FakeHealthRepository({today: 2500}), syncRepository).call(now: today);
+  test(
+    'a decreased total (correction) rewards nothing and does not go negative',
+    () async {
+      final today = DateTime(2026, 9, 8);
+      await SyncHealthDataUseCase(
+        _FakeHealthRepository({today: 2500}),
+        syncRepository,
+      ).call(now: today);
 
-    final result =
-        await SyncHealthDataUseCase(_FakeHealthRepository({today: 1000}), syncRepository).call(now: today);
-    final syncResult = (result as Ok<SyncResult>).value;
+      final result = await SyncHealthDataUseCase(
+        _FakeHealthRepository({today: 1000}),
+        syncRepository,
+      ).call(now: today);
+      final syncResult = (result as Ok<SyncResult>).value;
 
-    expect(syncResult.totalNewRewardableSteps, 0);
+      expect(syncResult.totalNewRewardableSteps, 0);
 
-    final recordResult = await syncRepository.getRecord(today);
-    final record = (recordResult as Ok<HealthDailyRecord?>).value!;
-    expect(record.totalSteps, 1000);
-    expect(record.rewardedSteps, 2500);
-  });
+      final recordResult = await syncRepository.getRecord(today);
+      final record = (recordResult as Ok<HealthDailyRecord?>).value!;
+      expect(record.totalSteps, 1000);
+      expect(record.rewardedSteps, 2500);
+    },
+  );
 
   test('first-ever sync caps the catch-up window to 7 days', () async {
     final today = DateTime(2026, 9, 8);
-    final stepsByDate = {for (var i = 0; i < 30; i++) today.subtract(Duration(days: i)): 100};
-    final useCase = SyncHealthDataUseCase(_FakeHealthRepository(stepsByDate), syncRepository);
+    final stepsByDate = {
+      for (var i = 0; i < 30; i++) today.subtract(Duration(days: i)): 100,
+    };
+    final useCase = SyncHealthDataUseCase(
+      _FakeHealthRepository(stepsByDate),
+      syncRepository,
+    );
 
     final result = await useCase.call(now: today);
     final syncResult = (result as Ok<SyncResult>).value;
@@ -130,12 +162,14 @@ void main() {
   test('catches up missed days plus today', () async {
     final lastSynced = DateTime(2026, 9, 5);
     final today = DateTime(2026, 9, 8);
-    await syncRepository.upsertRecord(HealthDailyRecord(
-      date: lastSynced,
-      totalSteps: 1000,
-      rewardedSteps: 1000,
-      lastSyncedAt: lastSynced,
-    ));
+    await syncRepository.upsertRecord(
+      HealthDailyRecord(
+        date: lastSynced,
+        totalSteps: 1000,
+        rewardedSteps: 1000,
+        lastSyncedAt: lastSynced,
+      ),
+    );
 
     final useCase = SyncHealthDataUseCase(
       _FakeHealthRepository({
@@ -156,56 +190,81 @@ void main() {
 
   test('a failure on the only date walked returns Err', () async {
     final today = DateTime(2026, 9, 8);
-    await syncRepository.upsertRecord(HealthDailyRecord(
-      date: today,
-      totalSteps: 100,
-      rewardedSteps: 100,
-      lastSyncedAt: today,
-    ));
-    final useCase = SyncHealthDataUseCase(_FakeHealthRepository({}, failOnDate: today), syncRepository);
-
-    final result = await useCase.call(now: today);
-    expect(result, isA<Err<SyncResult>>());
-  });
-
-  test('a failed date after a successful one returns the partial result', () async {
-    final dayBefore = DateTime(2026, 9, 7);
-    final today = DateTime(2026, 9, 8);
-    await syncRepository.upsertRecord(HealthDailyRecord(
-      date: dayBefore,
-      totalSteps: 0,
-      rewardedSteps: 0,
-      lastSyncedAt: dayBefore,
-    ));
-
+    await syncRepository.upsertRecord(
+      HealthDailyRecord(
+        date: today,
+        totalSteps: 100,
+        rewardedSteps: 100,
+        lastSyncedAt: today,
+      ),
+    );
     final useCase = SyncHealthDataUseCase(
-      _FakeHealthRepository({dayBefore: 1000}, failOnDate: today),
+      _FakeHealthRepository({}, failOnDate: today),
       syncRepository,
     );
 
     final result = await useCase.call(now: today);
-    final syncResult = (result as Ok<SyncResult>).value;
-
-    expect(syncResult.totalNewRewardableSteps, 1000);
-    expect(syncResult.days, [DailySyncResult(date: dayBefore, rewardableSteps: 1000)]);
-  });
-
-  test('a failure reading the most recent synced date returns Err immediately', () async {
-    final today = DateTime(2026, 9, 8);
-    final useCase =
-        SyncHealthDataUseCase(_FakeHealthRepository({today: 100}), _FailingSyncRepository());
-
-    final result = await useCase.call(now: today);
     expect(result, isA<Err<SyncResult>>());
   });
 
+  test(
+    'a failed date after a successful one returns the partial result',
+    () async {
+      final dayBefore = DateTime(2026, 9, 7);
+      final today = DateTime(2026, 9, 8);
+      await syncRepository.upsertRecord(
+        HealthDailyRecord(
+          date: dayBefore,
+          totalSteps: 0,
+          rewardedSteps: 0,
+          lastSyncedAt: dayBefore,
+        ),
+      );
+
+      final useCase = SyncHealthDataUseCase(
+        _FakeHealthRepository({dayBefore: 1000}, failOnDate: today),
+        syncRepository,
+      );
+
+      final result = await useCase.call(now: today);
+      final syncResult = (result as Ok<SyncResult>).value;
+
+      expect(syncResult.totalNewRewardableSteps, 1000);
+      expect(syncResult.days, [
+        DailySyncResult(date: dayBefore, rewardableSteps: 1000),
+      ]);
+    },
+  );
+
+  test(
+    'a failure reading the most recent synced date returns Err immediately',
+    () async {
+      final today = DateTime(2026, 9, 8);
+      final useCase = SyncHealthDataUseCase(
+        _FakeHealthRepository({today: 100}),
+        _FailingSyncRepository(),
+      );
+
+      final result = await useCase.call(now: today);
+      expect(result, isA<Err<SyncResult>>());
+    },
+  );
+
   test('after a downward correction, a later increase rewards only the new increase', () async {
     final today = DateTime(2026, 9, 8);
-    await SyncHealthDataUseCase(_FakeHealthRepository({today: 2500}), syncRepository).call(now: today);
-    await SyncHealthDataUseCase(_FakeHealthRepository({today: 1000}), syncRepository).call(now: today);
+    await SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 2500}),
+      syncRepository,
+    ).call(now: today);
+    await SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 1000}),
+      syncRepository,
+    ).call(now: today);
 
-    final result =
-        await SyncHealthDataUseCase(_FakeHealthRepository({today: 3000}), syncRepository).call(now: today);
+    final result = await SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 3000}),
+      syncRepository,
+    ).call(now: today);
     final syncResult = (result as Ok<SyncResult>).value;
 
     expect(syncResult.totalNewRewardableSteps, 500);
@@ -213,18 +272,26 @@ void main() {
 
   test('walked days are unique, consecutive calendar dates with no gaps or repeats', () async {
     final today = DateTime(2026, 9, 8);
-    final useCase = SyncHealthDataUseCase(_FakeHealthRepository({today: 100}), syncRepository);
+    final useCase = SyncHealthDataUseCase(
+      _FakeHealthRepository({today: 100}),
+      syncRepository,
+    );
 
     final result = await useCase.call(now: today);
     final syncResult = (result as Ok<SyncResult>).value;
 
     final dates = syncResult.days.map((d) => d.date).toList();
-    expect(dates.toSet().length, dates.length, reason: 'no date should be walked twice');
+    expect(
+      dates.toSet().length,
+      dates.length,
+      reason: 'no date should be walked twice',
+    );
     for (var i = 1; i < dates.length; i++) {
       expect(
         dates[i].difference(dates[i - 1]).inDays,
         1,
-        reason: 'consecutive walked dates must be exactly one calendar day apart',
+        reason:
+            'consecutive walked dates must be exactly one calendar day apart',
       );
     }
   });

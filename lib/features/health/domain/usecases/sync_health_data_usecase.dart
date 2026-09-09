@@ -12,13 +12,16 @@ class DailySyncResult {
 
   @override
   bool operator ==(Object other) =>
-      other is DailySyncResult && other.date == date && other.rewardableSteps == rewardableSteps;
+      other is DailySyncResult &&
+      other.date == date &&
+      other.rewardableSteps == rewardableSteps;
 
   @override
   int get hashCode => Object.hash(date, rewardableSteps);
 
   @override
-  String toString() => 'DailySyncResult(date: $date, rewardableSteps: $rewardableSteps)';
+  String toString() =>
+      'DailySyncResult(date: $date, rewardableSteps: $rewardableSteps)';
 }
 
 class SyncResult {
@@ -50,7 +53,11 @@ class SyncHealthDataUseCase {
       case Ok(value: final mostRecent):
         sinceDate = mostRecent != null
             ? _atMidnight(mostRecent)
-            : DateTime(today.year, today.month, today.day - (_firstSyncCatchUpDays - 1));
+            : DateTime(
+                today.year,
+                today.month,
+                today.day - (_firstSyncCatchUpDays - 1),
+              );
       case Err(:final failure):
         return Err(failure);
     }
@@ -68,9 +75,11 @@ class SyncHealthDataUseCase {
     // Calendar arithmetic via the DateTime constructor (not Duration) so a
     // DST transition can't drift the walk off local midnight — DateTime
     // normalizes month/year rollover for us.
-    for (var date = sinceDate;
-        !date.isAfter(today);
-        date = DateTime(date.year, date.month, date.day + 1)) {
+    for (
+      var date = sinceDate;
+      !date.isAfter(today);
+      date = DateTime(date.year, date.month, date.day + 1)
+    ) {
       final stepsResult = await _healthRepository.getStepsForDate(date);
       final int totalSteps;
       switch (stepsResult) {
@@ -79,7 +88,12 @@ class SyncHealthDataUseCase {
         case Err(:final failure):
           return days.isEmpty
               ? Err(failure)
-              : Ok(SyncResult(totalNewRewardableSteps: totalNewRewardableSteps, days: days));
+              : Ok(
+                  SyncResult(
+                    totalNewRewardableSteps: totalNewRewardableSteps,
+                    days: days,
+                  ),
+                );
       }
 
       final existingResult = await _syncRepository.getRecord(date);
@@ -90,30 +104,45 @@ class SyncHealthDataUseCase {
         case Err(:final failure):
           return days.isEmpty
               ? Err(failure)
-              : Ok(SyncResult(totalNewRewardableSteps: totalNewRewardableSteps, days: days));
+              : Ok(
+                  SyncResult(
+                    totalNewRewardableSteps: totalNewRewardableSteps,
+                    days: days,
+                  ),
+                );
       }
 
       final rewardedSoFar = existing?.rewardedSteps ?? 0;
       final delta = max(0, totalSteps - rewardedSoFar);
 
-      final upsertResult = await _syncRepository.upsertRecord(HealthDailyRecord(
-        date: date,
-        totalSteps: totalSteps,
-        rewardedSteps: rewardedSoFar + delta,
-        lastSyncedAt: resolvedNow,
-      ));
+      final upsertResult = await _syncRepository.upsertRecord(
+        HealthDailyRecord(
+          date: date,
+          totalSteps: totalSteps,
+          rewardedSteps: rewardedSoFar + delta,
+          lastSyncedAt: resolvedNow,
+        ),
+      );
       if (upsertResult case Err(:final failure)) {
         return days.isEmpty
             ? Err(failure)
-            : Ok(SyncResult(totalNewRewardableSteps: totalNewRewardableSteps, days: days));
+            : Ok(
+                SyncResult(
+                  totalNewRewardableSteps: totalNewRewardableSteps,
+                  days: days,
+                ),
+              );
       }
 
       days.add(DailySyncResult(date: date, rewardableSteps: delta));
       totalNewRewardableSteps += delta;
     }
 
-    return Ok(SyncResult(totalNewRewardableSteps: totalNewRewardableSteps, days: days));
+    return Ok(
+      SyncResult(totalNewRewardableSteps: totalNewRewardableSteps, days: days),
+    );
   }
 
-  DateTime _atMidnight(DateTime date) => DateTime(date.year, date.month, date.day);
+  DateTime _atMidnight(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
 }

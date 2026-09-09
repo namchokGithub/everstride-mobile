@@ -10,7 +10,9 @@ class SelectedDate extends Notifier<DateTime> {
   void set(DateTime date) => state = date;
 }
 
-final selectedDateProvider = NotifierProvider<SelectedDate, DateTime>(SelectedDate.new);
+final selectedDateProvider = NotifierProvider<SelectedDate, DateTime>(
+  SelectedDate.new,
+);
 
 final stepsForSelectedDateProvider = FutureProvider<Result<int>>((ref) {
   final date = ref.watch(selectedDateProvider);

@@ -60,6 +60,8 @@ class PlayerController extends Notifier<AsyncValue<Result<PlayerState>>?> {
     );
   }
 
+  Future<void> reload() => _loadPlayer();
+
   Future<void> _initializePlayer() async {
     await _runExclusive(() async {
       final result = await ref

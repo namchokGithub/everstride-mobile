@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/errors/result.dart';
 import '../../../player/presentation/controllers/player_controller.dart';
+import '../../../quest/presentation/controllers/quest_controller.dart';
 import '../../domain/adventure_catalog.dart';
 import '../../domain/entities/adventure.dart';
 import '../models/adventure_result.dart';
@@ -51,6 +54,11 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
 
     switch (result) {
       case Ok(:final value):
+        unawaited(
+          ref
+              .read(questControllerProvider.notifier)
+              .recordAdventureCompletion(),
+        );
         context.push(
           '/adventure-result',
           extra: AdventureResult(

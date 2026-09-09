@@ -37,7 +37,11 @@ class HealthSyncRepositoryImpl implements HealthSyncRepository {
       final row = await query.getSingleOrNull();
       return Ok(row == null ? null : DateTime.parse(row.date));
     } catch (e) {
-      AppLogger.error('health.sync', 'Failed to read most recent synced date', e);
+      AppLogger.error(
+        'health.sync',
+        'Failed to read most recent synced date',
+        e,
+      );
       return Err(Failure('Failed to read most recent synced date', cause: e));
     }
   }
@@ -45,17 +49,24 @@ class HealthSyncRepositoryImpl implements HealthSyncRepository {
   @override
   Future<Result<HealthDailyRecord?>> getRecord(DateTime date) async {
     try {
-      final row = await (_db.select(_db.healthDaily)..where((t) => t.date.equals(_dateKey(date))))
-          .getSingleOrNull();
+      final row = await (_db.select(
+        _db.healthDaily,
+      )..where((t) => t.date.equals(_dateKey(date)))).getSingleOrNull();
       if (row == null) return const Ok(null);
-      return Ok(HealthDailyRecord(
-        date: DateTime.parse(row.date),
-        totalSteps: row.totalSteps,
-        rewardedSteps: row.rewardedSteps,
-        lastSyncedAt: row.lastSyncedAt,
-      ));
+      return Ok(
+        HealthDailyRecord(
+          date: DateTime.parse(row.date),
+          totalSteps: row.totalSteps,
+          rewardedSteps: row.rewardedSteps,
+          lastSyncedAt: row.lastSyncedAt,
+        ),
+      );
     } catch (e) {
-      AppLogger.error('health.sync', 'Failed to read health_daily record for $date', e);
+      AppLogger.error(
+        'health.sync',
+        'Failed to read health_daily record for $date',
+        e,
+      );
       return Err(Failure('Failed to read health_daily record', cause: e));
     }
   }
@@ -63,7 +74,9 @@ class HealthSyncRepositoryImpl implements HealthSyncRepository {
   @override
   Future<Result<bool>> upsertRecord(HealthDailyRecord record) async {
     try {
-      await _db.into(_db.healthDaily).insertOnConflictUpdate(
+      await _db
+          .into(_db.healthDaily)
+          .insertOnConflictUpdate(
             HealthDailyCompanion.insert(
               date: _dateKey(record.date),
               totalSteps: record.totalSteps,
@@ -71,10 +84,17 @@ class HealthSyncRepositoryImpl implements HealthSyncRepository {
               lastSyncedAt: record.lastSyncedAt,
             ),
           );
-      AppLogger.debug('health.sync', 'Upserted health_daily row for ${record.date}');
+      AppLogger.debug(
+        'health.sync',
+        'Upserted health_daily row for ${record.date}',
+      );
       return const Ok(true);
     } catch (e) {
-      AppLogger.error('health.sync', 'Failed to write health_daily record for ${record.date}', e);
+      AppLogger.error(
+        'health.sync',
+        'Failed to write health_daily record for ${record.date}',
+        e,
+      );
       return Err(Failure('Failed to write health_daily record', cause: e));
     }
   }

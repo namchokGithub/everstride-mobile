@@ -14,14 +14,20 @@ class HealthPermissionController extends Notifier<AsyncValue<Result<bool>>?> {
   }
 
   Future<void> _recheckCurrentStatus() async {
-    state = await AsyncValue.guard(() => ref.read(healthRepositoryProvider).hasPermission());
+    state = await AsyncValue.guard(
+      () => ref.read(healthRepositoryProvider).hasPermission(),
+    );
   }
 
   Future<void> requestPermission() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => ref.read(healthRepositoryProvider).requestPermissions());
+    state = await AsyncValue.guard(
+      () => ref.read(healthRepositoryProvider).requestPermissions(),
+    );
   }
 }
 
 final healthPermissionControllerProvider =
-    NotifierProvider<HealthPermissionController, AsyncValue<Result<bool>>?>(HealthPermissionController.new);
+    NotifierProvider<HealthPermissionController, AsyncValue<Result<bool>>?>(
+      HealthPermissionController.new,
+    );
