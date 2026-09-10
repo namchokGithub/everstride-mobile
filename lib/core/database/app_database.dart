@@ -41,6 +41,7 @@ class AppSettings extends Table {
   IntColumn get id => integer()();
   BoolColumn get onboardingCompleted =>
       boolean().withDefault(const Constant(false))();
+  TextColumn get linkedCloudUserId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -85,7 +86,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -105,6 +106,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 6) {
         await m.createTable(dailyQuestInstances);
+      }
+      if (from < 7) {
+        await m.addColumn(appSettings, appSettings.linkedCloudUserId);
       }
     },
   );

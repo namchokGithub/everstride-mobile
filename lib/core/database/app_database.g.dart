@@ -832,8 +832,24 @@ class $AppSettingsTable extends AppSettings
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _linkedCloudUserIdMeta = const VerificationMeta(
+    'linkedCloudUserId',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, onboardingCompleted];
+  late final GeneratedColumn<String> linkedCloudUserId =
+      GeneratedColumn<String>(
+        'linked_cloud_user_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    onboardingCompleted,
+    linkedCloudUserId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -858,6 +874,15 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('linked_cloud_user_id')) {
+      context.handle(
+        _linkedCloudUserIdMeta,
+        linkedCloudUserId.isAcceptableOrUnknown(
+          data['linked_cloud_user_id']!,
+          _linkedCloudUserIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -875,6 +900,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}onboarding_completed'],
       )!,
+      linkedCloudUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_cloud_user_id'],
+      ),
     );
   }
 
@@ -887,12 +916,20 @@ class $AppSettingsTable extends AppSettings
 class AppSetting extends DataClass implements Insertable<AppSetting> {
   final int id;
   final bool onboardingCompleted;
-  const AppSetting({required this.id, required this.onboardingCompleted});
+  final String? linkedCloudUserId;
+  const AppSetting({
+    required this.id,
+    required this.onboardingCompleted,
+    this.linkedCloudUserId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['onboarding_completed'] = Variable<bool>(onboardingCompleted);
+    if (!nullToAbsent || linkedCloudUserId != null) {
+      map['linked_cloud_user_id'] = Variable<String>(linkedCloudUserId);
+    }
     return map;
   }
 
@@ -900,6 +937,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     return AppSettingsCompanion(
       id: Value(id),
       onboardingCompleted: Value(onboardingCompleted),
+      linkedCloudUserId: linkedCloudUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedCloudUserId),
     );
   }
 
@@ -913,6 +953,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       onboardingCompleted: serializer.fromJson<bool>(
         json['onboardingCompleted'],
       ),
+      linkedCloudUserId: serializer.fromJson<String?>(
+        json['linkedCloudUserId'],
+      ),
     );
   }
   @override
@@ -921,12 +964,20 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'onboardingCompleted': serializer.toJson<bool>(onboardingCompleted),
+      'linkedCloudUserId': serializer.toJson<String?>(linkedCloudUserId),
     };
   }
 
-  AppSetting copyWith({int? id, bool? onboardingCompleted}) => AppSetting(
+  AppSetting copyWith({
+    int? id,
+    bool? onboardingCompleted,
+    Value<String?> linkedCloudUserId = const Value.absent(),
+  }) => AppSetting(
     id: id ?? this.id,
     onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+    linkedCloudUserId: linkedCloudUserId.present
+        ? linkedCloudUserId.value
+        : this.linkedCloudUserId,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
     return AppSetting(
@@ -934,6 +985,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       onboardingCompleted: data.onboardingCompleted.present
           ? data.onboardingCompleted.value
           : this.onboardingCompleted,
+      linkedCloudUserId: data.linkedCloudUserId.present
+          ? data.linkedCloudUserId.value
+          : this.linkedCloudUserId,
     );
   }
 
@@ -941,50 +995,59 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   String toString() {
     return (StringBuffer('AppSetting(')
           ..write('id: $id, ')
-          ..write('onboardingCompleted: $onboardingCompleted')
+          ..write('onboardingCompleted: $onboardingCompleted, ')
+          ..write('linkedCloudUserId: $linkedCloudUserId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, onboardingCompleted);
+  int get hashCode => Object.hash(id, onboardingCompleted, linkedCloudUserId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AppSetting &&
           other.id == this.id &&
-          other.onboardingCompleted == this.onboardingCompleted);
+          other.onboardingCompleted == this.onboardingCompleted &&
+          other.linkedCloudUserId == this.linkedCloudUserId);
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<int> id;
   final Value<bool> onboardingCompleted;
+  final Value<String?> linkedCloudUserId;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.onboardingCompleted = const Value.absent(),
+    this.linkedCloudUserId = const Value.absent(),
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
     this.onboardingCompleted = const Value.absent(),
+    this.linkedCloudUserId = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
     Expression<bool>? onboardingCompleted,
+    Expression<String>? linkedCloudUserId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (onboardingCompleted != null)
         'onboarding_completed': onboardingCompleted,
+      if (linkedCloudUserId != null) 'linked_cloud_user_id': linkedCloudUserId,
     });
   }
 
   AppSettingsCompanion copyWith({
     Value<int>? id,
     Value<bool>? onboardingCompleted,
+    Value<String?>? linkedCloudUserId,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+      linkedCloudUserId: linkedCloudUserId ?? this.linkedCloudUserId,
     );
   }
 
@@ -997,6 +1060,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (onboardingCompleted.present) {
       map['onboarding_completed'] = Variable<bool>(onboardingCompleted.value);
     }
+    if (linkedCloudUserId.present) {
+      map['linked_cloud_user_id'] = Variable<String>(linkedCloudUserId.value);
+    }
     return map;
   }
 
@@ -1004,7 +1070,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   String toString() {
     return (StringBuffer('AppSettingsCompanion(')
           ..write('id: $id, ')
-          ..write('onboardingCompleted: $onboardingCompleted')
+          ..write('onboardingCompleted: $onboardingCompleted, ')
+          ..write('linkedCloudUserId: $linkedCloudUserId')
           ..write(')'))
         .toString();
   }
@@ -2299,11 +2366,13 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
     AppSettingsCompanion Function({
       Value<int> id,
       Value<bool> onboardingCompleted,
+      Value<String?> linkedCloudUserId,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
       Value<int> id,
       Value<bool> onboardingCompleted,
+      Value<String?> linkedCloudUserId,
     });
 
 class $$AppSettingsTableFilterComposer
@@ -2322,6 +2391,11 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<bool> get onboardingCompleted => $composableBuilder(
     column: $table.onboardingCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get linkedCloudUserId => $composableBuilder(
+    column: $table.linkedCloudUserId,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2344,6 +2418,11 @@ class $$AppSettingsTableOrderingComposer
     column: $table.onboardingCompleted,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get linkedCloudUserId => $composableBuilder(
+    column: $table.linkedCloudUserId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AppSettingsTableAnnotationComposer
@@ -2360,6 +2439,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get onboardingCompleted => $composableBuilder(
     column: $table.onboardingCompleted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get linkedCloudUserId => $composableBuilder(
+    column: $table.linkedCloudUserId,
     builder: (column) => column,
   );
 }
@@ -2397,17 +2481,21 @@ class $$AppSettingsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<bool> onboardingCompleted = const Value.absent(),
+                Value<String?> linkedCloudUserId = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 onboardingCompleted: onboardingCompleted,
+                linkedCloudUserId: linkedCloudUserId,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<bool> onboardingCompleted = const Value.absent(),
+                Value<String?> linkedCloudUserId = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 onboardingCompleted: onboardingCompleted,
+                linkedCloudUserId: linkedCloudUserId,
               ),
           withReferenceMapper: (p0) => p0
               .map(

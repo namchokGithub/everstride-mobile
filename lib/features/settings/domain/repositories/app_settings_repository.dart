@@ -4,4 +4,6 @@ import '../../../../core/errors/result.dart';
 abstract class AppSettingsRepository {
   Future<Result<bool>> getOnboardingCompleted();
   Future<Result<bool>> setOnboardingCompleted(bool value);
+  Future<Result<String?>> getLinkedCloudUserId();
+  Future<Result<bool>> setLinkedCloudUserId(String? userId);
 }

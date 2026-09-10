@@ -44,6 +44,43 @@ class AppSettingsRepositoryImpl implements AppSettingsRepository {
       return Err(Failure('Failed to save onboarding status', cause: e));
     }
   }
+
+  @override
+  Future<Result<String?>> getLinkedCloudUserId() async {
+    try {
+      final row = await (_db.select(
+        _db.appSettings,
+      )..where((t) => t.id.equals(_settingsId))).getSingleOrNull();
+      return Ok(row?.linkedCloudUserId);
+    } catch (e) {
+      AppLogger.error('settings.state', 'Failed to read linked cloud user', e);
+      return Err(Failure('Failed to read linked cloud user', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<bool>> setLinkedCloudUserId(String? userId) async {
+    try {
+      final existing = await (_db.select(
+        _db.appSettings,
+      )..where((t) => t.id.equals(_settingsId))).getSingleOrNull();
+      await _db
+          .into(_db.appSettings)
+          .insertOnConflictUpdate(
+            AppSettingsCompanion(
+              id: const Value(_settingsId),
+              onboardingCompleted: Value(
+                existing?.onboardingCompleted ?? false,
+              ),
+              linkedCloudUserId: Value(userId),
+            ),
+          );
+      return const Ok(true);
+    } catch (e) {
+      AppLogger.error('settings.state', 'Failed to save linked cloud user', e);
+      return Err(Failure('Failed to save linked cloud user', cause: e));
+    }
+  }
 }
 
 final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {

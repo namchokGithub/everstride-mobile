@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/errors/result.dart';
+import '../../../auth/data/repositories/auth_repository_impl.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../auth/presentation/controllers/player_cloud_sync_controller.dart';
 import '../../../health/presentation/controllers/health_availability_controller.dart';
 import '../../../health/presentation/controllers/health_permission_controller.dart';
 import '../../../health/presentation/controllers/health_sync_controller.dart';
@@ -32,16 +36,66 @@ class MenuScreen extends ConsumerWidget {
     };
     final sync = ref.watch(healthSyncControllerProvider);
     final syncing = sync?.isLoading ?? false;
+    final auth = ref.watch(authControllerProvider);
+    final authAvailable = ref.watch(authRepositoryProvider).isAvailable;
+    final backup = ref.watch(playerCloudSyncControllerProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Menu')),
       body: ListView(
         children: [
-          const ListTile(
-            leading: CircleAvatar(child: Icon(Icons.person)),
-            title: Text('Player'),
-            subtitle: Text('View Profile'),
+          ListTile(
+            leading: const CircleAvatar(child: Icon(Icons.person)),
+            title: Text(
+              authAvailable
+                  ? (auth?.email ?? 'Guest')
+                  : 'Cloud Backup unavailable',
+            ),
+            subtitle: Text(
+              authAvailable
+                  ? _backupText(backup)
+                  : 'Add Supabase config to enable sign-in',
+            ),
+            enabled: authAvailable,
+            onTap: !authAvailable || auth != null
+                ? null
+                : () => context.push('/auth'),
+            trailing: auth == null
+                ? null
+                : TextButton(
+                    onPressed: () =>
+                        ref.read(authControllerProvider.notifier).signOut(),
+                    child: const Text('Sign Out'),
+                  ),
           ),
+          if (authAvailable &&
+              auth != null &&
+              backup.state == CloudBackupState.confirmationRequired)
+            ListTile(
+              leading: const Icon(Icons.warning_amber_rounded),
+              title: const Text('Cloud backup found'),
+              subtitle: const Text(
+                'Choose whether to restore it or replace it with this device.',
+              ),
+              trailing: FilledButton(
+                onPressed: () => _chooseCloudBackup(context, ref),
+                child: const Text('Review'),
+              ),
+            )
+          else if (authAvailable &&
+              auth != null &&
+              backup.state == CloudBackupState.failed)
+            ListTile(
+              leading: const Icon(Icons.cloud_off),
+              title: const Text('Backup failed'),
+              subtitle: Text(backup.message ?? 'Try again when online.'),
+              trailing: TextButton(
+                onPressed: () => ref
+                    .read(playerCloudSyncControllerProvider.notifier)
+                    .retry(),
+                child: const Text('Retry'),
+              ),
+            ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.sync),
@@ -83,4 +137,64 @@ class MenuScreen extends ConsumerWidget {
       ),
     );
   }
+
+  static String _backupText(CloudBackupStatus status) => switch (status.state) {
+    CloudBackupState.idle => 'Signed in · Backup ready',
+    CloudBackupState.syncing => 'Cloud Backup syncing…',
+    CloudBackupState.backedUp => 'Cloud Backup up to date',
+    CloudBackupState.failed => 'Cloud Backup needs attention',
+    CloudBackupState.confirmationRequired => 'Backup confirmation required',
+    CloudBackupState.unavailable => 'Cloud Backup unavailable',
+  };
+
+  static Future<void> _chooseCloudBackup(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final choice = await showDialog<_CloudBackupChoice>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Choose cloud backup'),
+        content: const Text(
+          'Restore cloud backup replaces progress on this device. Replace cloud '
+          'backup permanently overwrites the signed-in account backup with this '
+          'device. Restore is the safer choice.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context, _CloudBackupChoice.restore),
+            child: const Text('Restore cloud backup'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(context, _CloudBackupChoice.replace),
+            child: const Text('Replace cloud backup'),
+          ),
+        ],
+      ),
+    );
+    switch (choice) {
+      case _CloudBackupChoice.restore:
+        await ref
+            .read(playerCloudSyncControllerProvider.notifier)
+            .restoreCloudBackup();
+        return;
+      case _CloudBackupChoice.replace:
+        await ref
+            .read(playerCloudSyncControllerProvider.notifier)
+            .confirmOverwrite();
+        return;
+      case null:
+        return;
+    }
+  }
 }
+
+enum _CloudBackupChoice { restore, replace }
