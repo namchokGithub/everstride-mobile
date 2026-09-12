@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/theme/app_theme.dart';
 import '../../../../core/errors/result.dart';
 import '../../../quest/domain/entities/quest_instance.dart';
 import '../../../quest/domain/quest_catalog.dart';
@@ -19,7 +20,7 @@ class JournalScreen extends ConsumerWidget {
     if (instances == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Journal')),
-        body: const Center(child: Text('Loading...')),
+        body: const Center(child: Text("Gathering today's Quests…")),
       );
     }
     final sorted = [...instances]
@@ -68,7 +69,7 @@ class _QuestCard extends ConsumerWidget {
                   definition.title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(instance.status.name),
+                _QuestStatusLabel(status: instance.status),
               ],
             ),
             const SizedBox(height: 4),
@@ -92,12 +93,20 @@ class _QuestCard extends ConsumerWidget {
                       final result = await ref
                           .read(questControllerProvider.notifier)
                           .claim(instance);
-                      if (result case Err(:final failure)) {
-                        if (context.mounted) {
+                      if (!context.mounted) return;
+                      switch (result) {
+                        case Ok():
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Claimed! +${instance.expReward} EXP, +${instance.goldReward} Gold',
+                              ),
+                            ),
+                          );
+                        case Err(:final failure):
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(failure.message)),
                           );
-                        }
                       }
                     },
                     child: const Text('Claim'),
@@ -105,6 +114,45 @@ class _QuestCard extends ConsumerWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuestStatusLabel extends StatelessWidget {
+  const _QuestStatusLabel({required this.status});
+
+  final QuestStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = switch (status) {
+      QuestStatus.inProgress => 'In Progress',
+      QuestStatus.claimable => 'Ready to claim',
+      QuestStatus.claimed => 'Claimed',
+      QuestStatus.expired => 'Expired',
+    };
+    if (status != QuestStatus.claimable) {
+      return Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textSecondaryColor,
+        ),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppTheme.mint,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          color: AppTheme.deepNavy,
         ),
       ),
     );

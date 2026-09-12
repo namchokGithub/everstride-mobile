@@ -32,6 +32,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Pick a date',
             icon: const Icon(Icons.calendar_today_outlined),
             onPressed: () async {
               final selectedDate = ref.read(selectedDateProvider);
@@ -202,6 +203,7 @@ class _Dashboard extends ConsumerWidget {
         ),
         Center(
           child: IconButton(
+            tooltip: 'Sync now',
             icon: (steps.isLoading || (sync?.isLoading ?? false))
                 ? const SizedBox(
                     width: 20,
