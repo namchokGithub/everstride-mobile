@@ -4,7 +4,7 @@
 
 Everstride is a health-powered RPG mobile game where real-world activity becomes in-game progress.
 
-Walk in real life, earn energy, complete adventures, level up your character, collect equipment, and progress through a fantasy world.
+Walk in real life, earn Energy, complete Adventures and Daily Quests, level up your character, and progress through a fantasy world.
 
 ## Core Concept
 
@@ -12,7 +12,7 @@ Real-world activity drives your in-game progression:
 
 - Steps → Energy
 - Energy → Adventures
-- Adventures → EXP, Gold, and Items
+- Adventures and Quests → EXP and Gold
 - EXP → Character Progression
 
 ## Tech Stack
@@ -26,8 +26,6 @@ Real-world activity drives your in-game progression:
 - Supabase
   - Auth
   - PostgreSQL
-  - Storage
-  - Realtime
 
 Future integrations may include:
 
@@ -49,7 +47,16 @@ flutter pub get
 cp .env.example .env
 ```
 
-`.env` holds Supabase config (`SUPABASE_URL`, `SUPABASE_ANON_KEY`). It's gitignored — leave the values blank until a Supabase project exists (see Phase 6 in `everstride-docs/plan/EVERSTRIDE_PLAN.md`); the app runs fine locally without them for now.
+`.env` holds optional Supabase config:
+
+```text
+SUPABASE_URL=<Project URL>
+SUPABASE_ANON_KEY=<Publishable key>
+```
+
+Copy the values from the Supabase project's Connect/API settings. Use the publishable key only; never put a secret or service-role key in the app. Without both values, the app remains fully playable locally and Cloud Backup is unavailable in Menu. With them, players can create an email/password account and back up Player, Health checkpoint, and Daily Quest state.
+
+Cloud Backup is currently intended for one primary device. A new device with an existing backup asks whether to Restore or Replace it. Simultaneous play on multiple devices is not yet conflict-safe; see `everstride-docs/PROGRESS.md`.
 
 Run:
 
@@ -61,7 +68,7 @@ flutter run
 Check code health:
 
 ```sh
-flutter format .
+dart format .
 flutter analyze
 ```
 
@@ -71,7 +78,7 @@ For current build status and what to work on next, see `everstride-docs/PROGRESS
 
 ## Testing Health Connect on an Emulator
 
-An emulator has no pedometer, so it never generates real step data — Health Connect will read `0` steps even after granting permission. In debug builds, a "[Debug] Insert 500 test steps" button on the Home screen writes synthetic step data directly into Health Connect so the read path can be exercised without a real device.
+An emulator has no pedometer, so it never generates real step data — Health Connect will read `0` steps even after granting permission. In debug builds, Menu → Debug Tools has a Test steps field (default `100`) and an insert button. It writes that amount into a past Health Connect time slot for the selected date, so the read path can be exercised without a real device. Sync afterward to convert newly rewardable Steps into Energy.
 
 If the app's own permission requests stop showing a dialog and just silently fail (`SecurityException` in logcat, or a "No requestable permission in the request" log line), the permission is likely stuck with a `USER_FIXED` flag from earlier manual testing (e.g. mixing `adb shell pm revoke` with denying the real dialog). Clear it with:
 

@@ -73,6 +73,16 @@ class DailyQuestInstances extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Append-only, local-only observations for balancing analysis. Gameplay never
+/// reads this table and cloud snapshots deliberately exclude it.
+class MetricEvents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get occurredAt => dateTime()();
+  TextColumn get localDate => text()();
+  TextColumn get eventType => text()();
+  TextColumn get payload => text()();
+}
+
 @DriftDatabase(
   tables: [
     HealthDaily,
@@ -80,13 +90,14 @@ class DailyQuestInstances extends Table {
     AppSettings,
     DebugStepSeedCursors,
     DailyQuestInstances,
+    MetricEvents,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -109,6 +120,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 7) {
         await m.addColumn(appSettings, appSettings.linkedCloudUserId);
+      }
+      if (from < 8) {
+        await m.createTable(metricEvents);
       }
     },
   );

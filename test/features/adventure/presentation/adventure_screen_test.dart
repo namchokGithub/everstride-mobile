@@ -33,6 +33,9 @@ class _SuccessfulPlayerController extends PlayerController {
 
   @override
   Future<Result<PlayerState>> spendOnAdventure({
+    required String adventureId,
+    required String difficultyId,
+    required bool suppliesSelected,
     required int energyCost,
     required int expReward,
     required int goldReward,
@@ -58,6 +61,9 @@ class _FailingPlayerController extends PlayerController {
 
   @override
   Future<Result<PlayerState>> spendOnAdventure({
+    required String adventureId,
+    required String difficultyId,
+    required bool suppliesSelected,
     required int energyCost,
     required int expReward,
     required int goldReward,
@@ -76,6 +82,9 @@ class _DelayedPlayerController extends PlayerController {
 
   @override
   Future<Result<PlayerState>> spendOnAdventure({
+    required String adventureId,
+    required String difficultyId,
+    required bool suppliesSelected,
     required int energyCost,
     required int expReward,
     required int goldReward,
@@ -95,6 +104,9 @@ class _LowGoldPlayerController extends PlayerController {
 
   @override
   Future<Result<PlayerState>> spendOnAdventure({
+    required String adventureId,
+    required String difficultyId,
+    required bool suppliesSelected,
     required int energyCost,
     required int expReward,
     required int goldReward,

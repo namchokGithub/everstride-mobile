@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/errors/result.dart';
+import '../../../../core/metrics/metrics_recorder.dart';
+import '../../../player/domain/repositories/player_repository.dart';
 import '../../../player/presentation/controllers/player_controller.dart';
 import '../../../quest/presentation/controllers/quest_controller.dart';
 import '../../domain/adventure_catalog.dart';
@@ -39,15 +41,42 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
     };
     if (playerBefore == null) return;
 
+    final requestedExp = _useTrailSupplies
+        ? (difficulty.expReward * _trailSuppliesMultiplier).floor()
+        : difficulty.expReward;
+    final requestedGold = _useTrailSupplies
+        ? (difficulty.goldReward * _trailSuppliesMultiplier).floor()
+        : difficulty.goldReward;
+    final requestedGoldCost = _useTrailSupplies ? _trailSuppliesCost : 0;
     if (playerBefore.energy < difficulty.energyCost) {
+      _recordPreflightRejection(
+        difficulty: difficulty,
+        playerBefore: playerBefore,
+        expReward: requestedExp,
+        goldReward: requestedGold,
+        additionalGoldCost: requestedGoldCost,
+        outcome: 'insufficient_energy',
+      );
+      setState(() => _isStarting = true);
       await _showInsufficientEnergyDialog(difficulty, playerBefore.energy);
+      if (mounted) setState(() => _isStarting = false);
       return;
     }
 
     final applySupplies =
         _useTrailSupplies && playerBefore.gold >= _trailSuppliesCost;
     if (_useTrailSupplies && !applySupplies) {
+      _recordPreflightRejection(
+        difficulty: difficulty,
+        playerBefore: playerBefore,
+        expReward: requestedExp,
+        goldReward: requestedGold,
+        additionalGoldCost: requestedGoldCost,
+        outcome: 'insufficient_gold',
+      );
+      setState(() => _isStarting = true);
       await _showInsufficientGoldDialog(playerBefore.gold);
+      if (mounted) setState(() => _isStarting = false);
       return;
     }
     final expReward = applySupplies
@@ -62,6 +91,9 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
     final result = await ref
         .read(playerControllerProvider.notifier)
         .spendOnAdventure(
+          adventureId: _adventure.id,
+          difficultyId: difficulty.id,
+          suppliesSelected: _useTrailSupplies,
           energyCost: difficulty.energyCost,
           expReward: expReward,
           goldReward: goldReward,
@@ -101,6 +133,37 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
               .showSnackBar(SnackBar(content: Text(failure.message)));
         }
     }
+  }
+
+  void _recordPreflightRejection({
+    required AdventureDifficulty difficulty,
+    required PlayerState playerBefore,
+    required int expReward,
+    required int goldReward,
+    required int additionalGoldCost,
+    required String outcome,
+  }) {
+    ref
+        .read(metricsRecorderProvider)
+        .record(
+          eventType: 'adventure_attempt',
+          buildPayload: () => {
+            'adventureId': _adventure.id,
+            'difficultyId': difficulty.id,
+            'suppliesSelected': _useTrailSupplies,
+            'outcome': outcome,
+            'energyCost': difficulty.energyCost,
+            'expReward': expReward,
+            'goldReward': goldReward,
+            'additionalGoldCost': additionalGoldCost,
+            'energyBeforeObserved': playerBefore.energy,
+            'energyAfter': null,
+            'energySpent': 0,
+            'expGranted': 0,
+            'goldGranted': 0,
+            'goldSpent': 0,
+          },
+        );
   }
 
   Future<void> _showInsufficientGoldDialog(int currentGold) => showDialog<void>(

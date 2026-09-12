@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/errors/result.dart';
+import '../../../../core/metrics/metrics_recorder.dart';
 import '../../../../core/utils/app_logger.dart';
 import '../../../health/data/repositories/health_sync_repository_impl.dart';
 import '../../../health/presentation/controllers/health_sync_controller.dart';
@@ -19,6 +20,7 @@ final ensureDailyQuestsUseCaseProvider = Provider<EnsureDailyQuestsUseCase>(
   (ref) => EnsureDailyQuestsUseCase(
     ref.watch(questRepositoryProvider),
     ref.watch(healthSyncRepositoryProvider),
+    ref.watch(metricsRecorderProvider),
   ),
 );
 final recordAdventureCompletionUseCaseProvider =
@@ -91,10 +93,52 @@ class QuestController
         .read(claimDailyQuestUseCaseProvider)
         .call(instance);
     if (result case Err(:final failure)) return Err(failure);
+    final instanceId = instance.id;
+    final questRepository = ref.read(questRepositoryProvider);
+    ref
+        .read(metricsRecorderProvider)
+        .record(
+          eventType: 'quest_claimed',
+          buildPayload: () async {
+            final storedResult = await questRepository.getInstanceById(
+              instanceId,
+            );
+            final stored = switch (storedResult) {
+              Ok(value: final value) => value,
+              Err() => null,
+            };
+            if (stored == null) {
+              AppLogger.error(
+                'metrics.quest',
+                'Could not read persisted quest for claim metric',
+              );
+              return null;
+            }
+            if (stored.id != instanceId ||
+                stored.status != QuestStatus.claimed ||
+                stored.claimedAt == null) {
+              AppLogger.error(
+                'metrics.quest',
+                'Persisted quest was not claimed for claim metric',
+              );
+              return null;
+            }
+            return {
+              'instanceId': stored.id,
+              'questId': stored.questId,
+              'date': _dateKey(stored.date),
+              'expGranted': stored.expReward,
+              'goldGranted': stored.goldReward,
+            };
+          },
+        );
     await ref.read(playerControllerProvider.notifier).reload();
     await _refresh();
     return const Ok(true);
   });
+
+  String _dateKey(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
 
 final questControllerProvider =

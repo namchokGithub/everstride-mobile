@@ -1906,6 +1906,361 @@ class DailyQuestInstancesCompanion extends UpdateCompanion<DailyQuestInstance> {
   }
 }
 
+class $MetricEventsTable extends MetricEvents
+    with TableInfo<$MetricEventsTable, MetricEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MetricEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _localDateMeta = const VerificationMeta(
+    'localDate',
+  );
+  @override
+  late final GeneratedColumn<String> localDate = GeneratedColumn<String>(
+    'local_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventTypeMeta = const VerificationMeta(
+    'eventType',
+  );
+  @override
+  late final GeneratedColumn<String> eventType = GeneratedColumn<String>(
+    'event_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    occurredAt,
+    localDate,
+    eventType,
+    payload,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'metric_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MetricEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('local_date')) {
+      context.handle(
+        _localDateMeta,
+        localDate.isAcceptableOrUnknown(data['local_date']!, _localDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localDateMeta);
+    }
+    if (data.containsKey('event_type')) {
+      context.handle(
+        _eventTypeMeta,
+        eventType.isAcceptableOrUnknown(data['event_type']!, _eventTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventTypeMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MetricEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MetricEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      localDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_date'],
+      )!,
+      eventType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_type'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+    );
+  }
+
+  @override
+  $MetricEventsTable createAlias(String alias) {
+    return $MetricEventsTable(attachedDatabase, alias);
+  }
+}
+
+class MetricEvent extends DataClass implements Insertable<MetricEvent> {
+  final int id;
+  final DateTime occurredAt;
+  final String localDate;
+  final String eventType;
+  final String payload;
+  const MetricEvent({
+    required this.id,
+    required this.occurredAt,
+    required this.localDate,
+    required this.eventType,
+    required this.payload,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['occurred_at'] = Variable<DateTime>(occurredAt);
+    map['local_date'] = Variable<String>(localDate);
+    map['event_type'] = Variable<String>(eventType);
+    map['payload'] = Variable<String>(payload);
+    return map;
+  }
+
+  MetricEventsCompanion toCompanion(bool nullToAbsent) {
+    return MetricEventsCompanion(
+      id: Value(id),
+      occurredAt: Value(occurredAt),
+      localDate: Value(localDate),
+      eventType: Value(eventType),
+      payload: Value(payload),
+    );
+  }
+
+  factory MetricEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MetricEvent(
+      id: serializer.fromJson<int>(json['id']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      localDate: serializer.fromJson<String>(json['localDate']),
+      eventType: serializer.fromJson<String>(json['eventType']),
+      payload: serializer.fromJson<String>(json['payload']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'localDate': serializer.toJson<String>(localDate),
+      'eventType': serializer.toJson<String>(eventType),
+      'payload': serializer.toJson<String>(payload),
+    };
+  }
+
+  MetricEvent copyWith({
+    int? id,
+    DateTime? occurredAt,
+    String? localDate,
+    String? eventType,
+    String? payload,
+  }) => MetricEvent(
+    id: id ?? this.id,
+    occurredAt: occurredAt ?? this.occurredAt,
+    localDate: localDate ?? this.localDate,
+    eventType: eventType ?? this.eventType,
+    payload: payload ?? this.payload,
+  );
+  MetricEvent copyWithCompanion(MetricEventsCompanion data) {
+    return MetricEvent(
+      id: data.id.present ? data.id.value : this.id,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      localDate: data.localDate.present ? data.localDate.value : this.localDate,
+      eventType: data.eventType.present ? data.eventType.value : this.eventType,
+      payload: data.payload.present ? data.payload.value : this.payload,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MetricEvent(')
+          ..write('id: $id, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('localDate: $localDate, ')
+          ..write('eventType: $eventType, ')
+          ..write('payload: $payload')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, occurredAt, localDate, eventType, payload);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MetricEvent &&
+          other.id == this.id &&
+          other.occurredAt == this.occurredAt &&
+          other.localDate == this.localDate &&
+          other.eventType == this.eventType &&
+          other.payload == this.payload);
+}
+
+class MetricEventsCompanion extends UpdateCompanion<MetricEvent> {
+  final Value<int> id;
+  final Value<DateTime> occurredAt;
+  final Value<String> localDate;
+  final Value<String> eventType;
+  final Value<String> payload;
+  const MetricEventsCompanion({
+    this.id = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.localDate = const Value.absent(),
+    this.eventType = const Value.absent(),
+    this.payload = const Value.absent(),
+  });
+  MetricEventsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime occurredAt,
+    required String localDate,
+    required String eventType,
+    required String payload,
+  }) : occurredAt = Value(occurredAt),
+       localDate = Value(localDate),
+       eventType = Value(eventType),
+       payload = Value(payload);
+  static Insertable<MetricEvent> custom({
+    Expression<int>? id,
+    Expression<DateTime>? occurredAt,
+    Expression<String>? localDate,
+    Expression<String>? eventType,
+    Expression<String>? payload,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (localDate != null) 'local_date': localDate,
+      if (eventType != null) 'event_type': eventType,
+      if (payload != null) 'payload': payload,
+    });
+  }
+
+  MetricEventsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? occurredAt,
+    Value<String>? localDate,
+    Value<String>? eventType,
+    Value<String>? payload,
+  }) {
+    return MetricEventsCompanion(
+      id: id ?? this.id,
+      occurredAt: occurredAt ?? this.occurredAt,
+      localDate: localDate ?? this.localDate,
+      eventType: eventType ?? this.eventType,
+      payload: payload ?? this.payload,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
+    }
+    if (localDate.present) {
+      map['local_date'] = Variable<String>(localDate.value);
+    }
+    if (eventType.present) {
+      map['event_type'] = Variable<String>(eventType.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MetricEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('localDate: $localDate, ')
+          ..write('eventType: $eventType, ')
+          ..write('payload: $payload')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1916,6 +2271,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $DebugStepSeedCursorsTable(this);
   late final $DailyQuestInstancesTable dailyQuestInstances =
       $DailyQuestInstancesTable(this);
+  late final $MetricEventsTable metricEvents = $MetricEventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1926,6 +2282,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appSettings,
     debugStepSeedCursors,
     dailyQuestInstances,
+    metricEvents,
   ];
 }
 
@@ -3027,6 +3384,211 @@ typedef $$DailyQuestInstancesTableProcessedTableManager =
       DailyQuestInstance,
       PrefetchHooks Function()
     >;
+typedef $$MetricEventsTableCreateCompanionBuilder =
+    MetricEventsCompanion Function({
+      Value<int> id,
+      required DateTime occurredAt,
+      required String localDate,
+      required String eventType,
+      required String payload,
+    });
+typedef $$MetricEventsTableUpdateCompanionBuilder =
+    MetricEventsCompanion Function({
+      Value<int> id,
+      Value<DateTime> occurredAt,
+      Value<String> localDate,
+      Value<String> eventType,
+      Value<String> payload,
+    });
+
+class $$MetricEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $MetricEventsTable> {
+  $$MetricEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localDate => $composableBuilder(
+    column: $table.localDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MetricEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MetricEventsTable> {
+  $$MetricEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get localDate => $composableBuilder(
+    column: $table.localDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MetricEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MetricEventsTable> {
+  $$MetricEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get localDate =>
+      $composableBuilder(column: $table.localDate, builder: (column) => column);
+
+  GeneratedColumn<String> get eventType =>
+      $composableBuilder(column: $table.eventType, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+}
+
+class $$MetricEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MetricEventsTable,
+          MetricEvent,
+          $$MetricEventsTableFilterComposer,
+          $$MetricEventsTableOrderingComposer,
+          $$MetricEventsTableAnnotationComposer,
+          $$MetricEventsTableCreateCompanionBuilder,
+          $$MetricEventsTableUpdateCompanionBuilder,
+          (
+            MetricEvent,
+            BaseReferences<_$AppDatabase, $MetricEventsTable, MetricEvent>,
+          ),
+          MetricEvent,
+          PrefetchHooks Function()
+        > {
+  $$MetricEventsTableTableManager(_$AppDatabase db, $MetricEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MetricEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MetricEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MetricEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> occurredAt = const Value.absent(),
+                Value<String> localDate = const Value.absent(),
+                Value<String> eventType = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+              }) => MetricEventsCompanion(
+                id: id,
+                occurredAt: occurredAt,
+                localDate: localDate,
+                eventType: eventType,
+                payload: payload,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime occurredAt,
+                required String localDate,
+                required String eventType,
+                required String payload,
+              }) => MetricEventsCompanion.insert(
+                id: id,
+                occurredAt: occurredAt,
+                localDate: localDate,
+                eventType: eventType,
+                payload: payload,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MetricEventsTable, MetricEvent>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MetricEventsTable,
+                    MetricEvent
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MetricEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MetricEventsTable,
+      MetricEvent,
+      $$MetricEventsTableFilterComposer,
+      $$MetricEventsTableOrderingComposer,
+      $$MetricEventsTableAnnotationComposer,
+      $$MetricEventsTableCreateCompanionBuilder,
+      $$MetricEventsTableUpdateCompanionBuilder,
+      (
+        MetricEvent,
+        BaseReferences<_$AppDatabase, $MetricEventsTable, MetricEvent>,
+      ),
+      MetricEvent,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3041,4 +3603,6 @@ class $AppDatabaseManager {
       $$DebugStepSeedCursorsTableTableManager(_db, _db.debugStepSeedCursors);
   $$DailyQuestInstancesTableTableManager get dailyQuestInstances =>
       $$DailyQuestInstancesTableTableManager(_db, _db.dailyQuestInstances);
+  $$MetricEventsTableTableManager get metricEvents =>
+      $$MetricEventsTableTableManager(_db, _db.metricEvents);
 }
