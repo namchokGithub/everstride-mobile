@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_theme.dart';
 import '../../../player/domain/repositories/player_repository.dart';
 import '../models/adventure_result.dart';
 
@@ -18,7 +19,7 @@ class AdventureResultScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.check_circle, size: 64),
+              const Icon(Icons.check_circle, size: 64, color: AppTheme.jade),
               const SizedBox(height: 16),
               const Text(
                 'Adventure Complete!',
@@ -28,9 +29,9 @@ class AdventureResultScreen extends StatelessWidget {
               Text('${result.adventureName} — ${result.difficultyLabel}'),
               const SizedBox(height: 24),
               if (result.leveledUp) ...[
-                Text(
-                  'Level Up! ${result.levelBefore} → ${result.playerAfter.level}',
-                  style: Theme.of(context).textTheme.titleLarge,
+                _LevelUpReveal(
+                  text:
+                      'Level Up! ${result.levelBefore} → ${result.playerAfter.level}',
                 ),
                 const SizedBox(height: 16),
               ],
@@ -61,6 +62,30 @@ class AdventureResultScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LevelUpReveal extends StatelessWidget {
+  const _LevelUpReveal({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final textWidget = Text(
+      text,
+      style: Theme.of(context).textTheme.titleLarge
+          ?.copyWith(color: AppTheme.jade, fontWeight: FontWeight.bold),
+    );
+    if (MediaQuery.of(context).disableAnimations) return textWidget;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.6, end: 1.0),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.elasticOut,
+      builder: (context, scale, child) =>
+          Transform.scale(scale: scale, child: child),
+      child: textWidget,
     );
   }
 }

@@ -169,7 +169,14 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
   Future<void> _showInsufficientGoldDialog(int currentGold) => showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Not enough Gold'),
+      icon: Icon(
+        Icons.savings_outlined,
+        color: Theme.of(context).colorScheme.error,
+      ),
+      title: Text(
+        'Not enough Gold',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
       content: Text(
         'Trail Supplies cost $_trailSuppliesCost Gold. You have $currentGold.',
       ),
@@ -189,10 +196,14 @@ class _AdventureScreenState extends ConsumerState<AdventureScreen> {
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Not enough Energy'),
+        icon: Icon(Icons.bolt, color: Theme.of(context).colorScheme.error),
+        title: Text(
+          'Not enough Energy',
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
         content: Text(
           '${_adventure.name} (${difficulty.label}) costs ${difficulty.energyCost} Energy. '
-          'You have $currentEnergy. Walk more to earn Energy, or pick an easier difficulty.',
+          'You have $currentEnergy. Walk a little more to earn Energy, then try again.',
         ),
         actions: [
           TextButton(
